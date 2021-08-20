@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+   <head>
+      <meta charset='utf-8'>
+      <title>N.S</title>
+      <!-- Loading all relevant scripts and stylesheets  -->
+      <!-- Loading relevant leaflet scripts and stylesheets  -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+         crossorigin=""/>
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="">  </script>
+      <!-- Loading relevant mapbox scripts and stylesheets for geocoding  -->
+      <link href="https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.css" rel="stylesheet">
+      <script src="https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.js"></script>
+      <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+      <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+      <!-- Loading relevant jquery libraries and bootstrap libraries for toggle mode  -->
+      <link rel = "stylesheet" href = "https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity = "sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin = "anonymous">
+      <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+      <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src = "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity = "sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin = "anonymous"></script>
+      <script src = "https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity = "sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin = "anonymous"></script>
+      <!-- Loading stylesheet for webpage  -->
+      <link rel="stylesheet" th:href="@{/static/css/styles.css}">
+      <!-- Loading scripts for canva5 used in traffic display  -->
+      <script th:src="@{static/js/leaflet_canvas_layer.js}"></script>
+      <script th:src="@{static/js/leaflet_tileloader_mixin.js}"></script>
+      <!-- Loading scripts traffic display (fetch and display) -->
+      <script th:src="@{static/js/traffic_disp/traffic_layer.js}"></script>
+      <script th:src="@{static/js/traffic_disp/traffic_fetch.js}"></script>
+      <!-- Loading script for converting string to title case-->
+      <script th:src="@{static/js/text_style/title_case.js}"></script>
+   </head>
+   <body style="background-color:#ccd6fa">
+      <div class="heading">
+         <p id="logo">Navigation System</p>
+         <!-- <p id="infotabs">Documentation</p> -->
+      </div>
+      <div class="parent">
+         <div class="inputbox" id="inputbox">
+            <div class="CollapseOps">
+               <button data-toggle="collapse"   data-target="#inputboxfirst" style="outline: none;color:#CAE00F;font-family:lucida sans unicode;border:none;background-color: #007D98;font-size: 25px;" aria-expanded="false">Routing Query</button>
+            </div>
+            <div class="collapse hide" id="inputboxfirst" data-parent="#inputbox">
+               <form id="form1" action="#" th:action="@{/routing}" th:object="${pt}" method="GET" onsubmit="return validateForm()">
+                  <div class="optiongrp" >
+                     <!-- Source and destination search -->
+                     <div class='inputboxcontainer'>
+                        <input type="hidden" id="hid1" th:field="*{StartLoc}">
+                        <input type="hidden" id="hid2" th:field="*{EndLoc}">
+                        <div  id='inputbox1'>
+                           Starting Location:
+                        </div>
+                        <div  id='inputbox2'>
+                           Ending Location:
+                        </div>
+                     </div>
+                     <div>
+                        <!-- Routing types search -->
+                        <input type="radio" th:field="*{RouteType}" id="greenest" name="routes" value="greenest" required>
+                        <label for="greenest" style="background-color:forestgreen;">Greenest Route</label>
+                        <br>
+                        <input type="radio" th:field="*{RouteType}" id="fastest" name="routes" value="fastest" required>
+                        <label style="background-color:indianred;"  for="fastest">Fastest Route</label>
+                        <br>
+                        <input type="radio" th:field="*{RouteType}" id="balanced" name="routes" value="balanced" required>
+                        <label for="balanced" style="background-color:royalblue;">Balanced Route</label>
+                        <!-- Vehicles types search -->
+                        <div class="parent">
+                           <input type="radio" th:field="*{Vehicle}" id="car" name="vehicles" value="car" required>
+                           <label for="car">Car</label>
+                           <input type="radio" th:field="*{Vehicle}" id="bike" name="vehicles" value="bike" required>
+                           <label for="bike">Bike</label>
+                           <input type="radio" th:field="*{Vehicle}" id="foot" name="vehicles" value="foot" required>
+                           <label for="foot">Foot</label>
+                        </div>
+                     </div>
+                     <!-- SUBMIT button -->
+                     <button class="options" style="outline: none;border:none; text-align: center; color: black;" > SUBMIT</button>
+                  </div>
+               </form>
+            </div>
+            <!-- Traffic display option -->
+            <div class="inputboxcontainer">
+               <input type="checkbox" id="traffic_disp" name="traffic_disp" value="traffic_disp" onclick="traffic_info()">
+               <label for="traffic_disp"> Traffic layer enable</label>
+            </div>
+         </div>
+         <!-- Map display search -->
+         <div id="mapid"></div>
+      </div>
+   </body>
+   <script type="text/javascript" th:inline="javascript">
+      //Creating leaflet map and adding tile layer
+      var map = L.map('mapid').setView([28.7041, 77.1025], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      /*
+      Adjusting height of turn by turn navigation instruction box
+      according to height of toggled state of main query box
+      */
+      $('#inputboxfirst').on('shown.bs.collapse', function () {
+      	   if(document.getElementById('instructionBox')!=null)
+      		   {
+      		   document.getElementById('instructionBox').style.height=100%-document.getElementById('mapid').offsetHeight+'px'
+      		   }
+      	   
+      	});
+      	$('#inputboxfirst').on('hidden.bs.collapse', function () {
+      		console.log("Closed")
+      		if(document.getElementById('instructionBox')!=null)
+      		   {
+      		   document.getElementById('instructionBox').style.height=250+'px'
+      		   }
+      		console.log(document.getElementById('mapid').offsetHeight)
+      	});
+   </script>
+   <script type="text/javascript" th:inline="javascript">
+      /*
+      Adding geocoding feature from mapbox
+      */
+      accessToken = 'pk.eyJ1Ijoic2lmLXIiLCJhIjoiY2tsYWhtbWhuMDVscjJ2cDB1MzBmbzk3eCJ9.bkUIdAw-I609MJqxivzB9g';
+      var geocoder1 = new MapboxGeocoder({
+      	accessToken: accessToken,
+      	mapboxgl: mapboxgl,
+      	countries: 'in'
+      	});
+      var geocoder2 = new MapboxGeocoder({
+      	accessToken: accessToken,
+      	mapboxgl: mapboxgl,
+      	countries: 'in'
+      	});
+          document.getElementById('inputbox1').appendChild(geocoder1.onAdd());
+      	document.getElementById('inputbox2').appendChild(geocoder2.onAdd());
+      	
+      	geocoder1.on('result', e => {
+      	       document.getElementById('hid1').value=e.result.center;
+      	  console.log(document.getElementById('hid1').value);
+      	})
+      	geocoder2.on('result', e => {
+      	  var geocoder_result = e.result.bbox;
+      	      document.getElementById('hid2').value=e.result.center;
+      	  console.log(document.getElementById('hid2').value);
+      	})
+      	geocoder1._inputEl.addEventListener('input', function (e) { document.getElementById('inputbox2').style.visibility = "hidden"; });
+      geocoder1._inputEl.addEventListener('blur', function (e) { document.getElementById('inputbox2').style.visibility = "visible"; });
+      
+   </script>
+   <script type="text/javascript" th:inline="javascript">
+      //validate source and destination box with regards to having appropriate values
+      function validateForm() {
+      	if(document.getElementById('hid1').value=="")
+      	{
+      	alert("Please fill starting location correctly");
+      	 return false;
+      	}
+      	if(document.getElementById('hid2').value=="")
+      	{
+      		alert("Please fill destination location correctly");
+      	 return false;
+      	}
+      	}
+      /*
+      Display of routing results
+      */      	
+      function codeAddress() {
+      
+      	 var data=/*[[${route}]]*/"";
+      	 console.log(data);
+      	 if(data!=null)
+      		 {
+      		 console.log(data);
+      
+      		 document.getElementById('hid1').value="";
+      		 document.getElementById('hid2').value="";
+      		 let colour='blue';
+      		 if (document.getElementById('greenest').checked) {
+      				colour='green';
+      				}
+      		 if (document.getElementById('fastest').checked) {
+      				colour='red';
+      				}
+      
+      			 for(let i=0;i<data.lats.length;i++)
+      			{
+      				if(i==0)
+      				{
+      					var start = L.marker([data.lats[i],data.longs[i]]).addTo(map);
+      					start.bindPopup("<b> Source </b>")
+      				}
+      				if(i==data.lats.length-1)
+      				{
+      					var end = L.marker([data.lats[i],data.longs[i]]).addTo(map);
+      					end.bindPopup("<b> Destination </b>")
+      					break;
+      				}
+      				var pointA=new L.LatLng(data.lats[i],data.longs[i]);
+      				var pointB=new L.LatLng(data.lats[i+1],data.longs[i+1]);
+      				var pointList=[pointA,pointB];
+      				var edge=new L.Polyline(pointList);
+      				edge.setStyle({
+      				    color: colour
+      				});
+      				//console.log(document.getElementById('greenest').checked);
+      				
+      	            edge.addTo(map);
+      			}
+      			//creating and adding instruction box to inputbox for turn by turn instructions
+      			var instructionBox=document.createElement('div');
+      			instructionBox.id='instructionBox';
+      			document.getElementById('inputbox').appendChild(instructionBox);
+      			instructionBox.style="background-color:rgb(210 229 219);color:forestgreen;font-size:20px;overflow:auto";
+      			document.getElementById('instructionBox').style.height=250+'px';
+      			instructionBox.innerHTML+="Turn-By-Turn Navigation"
+      			console.log(instructionBox.style.height);
+      			for(let i=0;i<data.navigationInstruction.length;i++)
+      			{
+      				let instruction=document.createElement('div');
+      				instruction.id=i;
+      				instruction.style="border:1px dotted black; color:black;font-size:10px"
+      				instruction.innerHTML+="<b>"+(i+1)+" "+toTitleCase(data.navigationInstruction[i])+"</b>";
+      				document.getElementById('instructionBox').appendChild(instruction);
+      			}
+      			
+      		
+      		 }
+      	}
+      	
+      window.onload =codeAddress;
+   </script>
+</html>

@@ -1,0 +1,99 @@
+@charset "ISO-8859-1";
+body,html {
+  margin:0;
+  height:100%;
+  padding:0;
+  display: flex;
+  flex-direction: column;
+  background-color: #CCD6FA;
+  font-family:lucida sans unicode;
+}
+.heading
+{
+	position: static;
+	background-color: #23395d;
+	margin: 0;
+	padding-top: 0.5px;
+	padding-left: 10px;
+	padding-bottom: 0.5px;
+
+}
+
+#logo
+{
+	padding: 10px;
+  font-size:20px;
+  color: #FFFFFF;
+}
+
+#infotabs
+{
+	position: absolute;
+	top:20px;
+	bottom: 20px;
+	right:10px;
+  font-size:15px;
+  color: #FFFFFF;
+}
+
+.parent
+{
+	flex-grow: 1;
+    flex-direction: column; 
+}
+.inputbox
+{
+	
+	background-color: #007D98;
+	width: 25%;
+	height:100%;
+	margin-bottom: 0;
+	float: left;
+	color:#FFFFFF;
+    font-size:15px;	
+    display: inline-block;
+}
+.CollapseOps
+{
+	padding-top: 50%;padding-left: 20%;padding-bottom: 2.5%;align-content: center;
+}
+.inputboxcontainer
+{
+	position: relative;
+text-align: center;
+padding: 2.5%;		
+}
+
+.optiongrp
+{
+	display: flex;  flex-grow: 1; flex-direction: column; justify-content: center;  align-items: center; 
+}
+.options
+{
+text-align: center;
+background-color: #007D98;
+color:#FFFFFF;
+}
+.options:hover
+{
+background-color: greenyellow;
+}
+#mapid
+{
+	width: 75%;
+	height: 100%;
+	float:left;
+	z-index: 1;
+}
+#car_label
+{
+	background-color: forestgreen;
+}
+#bike_label
+{
+	background-color: indianred;
+}
+#truck_label
+{
+	background-color: royalblue;
+}
