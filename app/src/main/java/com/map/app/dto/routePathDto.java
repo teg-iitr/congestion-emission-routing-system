@@ -19,7 +19,7 @@ import com.map.app.model.RouteInformation;
 import com.map.app.model.routePath;
 public class routePathDto {
 	private static final String MAP_URL = "maps/NewDelhi.osm.pbf";
-	private String apiKey = "1c78c959-7a2e-486b-b674-3df4ab665884";
+	private String apiKey = "<GH-API-KEY>";
 	private GraphHopper gh;
 	private Lock readLock;
 	private TrafficdatDto dt;

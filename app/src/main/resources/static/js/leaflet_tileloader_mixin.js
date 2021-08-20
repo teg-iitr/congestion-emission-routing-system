@@ -1,5 +1,4 @@
 	if(typeof(L) !== 'undefined') {
-
 		L.Mixin.TileLoader = {
 
 		  _initTileLoader: function() {

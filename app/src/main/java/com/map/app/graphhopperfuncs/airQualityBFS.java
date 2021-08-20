@@ -26,7 +26,6 @@ public class airQualityBFS extends XFirstSearch {
 		this.gh = gh;
 		this.hopper = hopper;
 		this.ap = ap;
-
 	}
 	@Override
 	protected GHBitSet createBitSet() {

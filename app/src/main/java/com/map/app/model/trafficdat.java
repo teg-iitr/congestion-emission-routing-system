@@ -5,7 +5,6 @@ public class trafficdat {
 	private List<List<Float>> lat;
 	private List<List<Float>> lons;
 	private List<List<Float>> speed;
-
 	public List<List<Float>> getLat() {
 		return lat;
 	}

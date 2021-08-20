@@ -18,15 +18,13 @@ import com.map.app.service.TrafficAndRoutingService;
 public class mapControl {
 	@Autowired
 	TrafficAndRoutingService trs;
-	
 	@GetMapping(value="/")
 	public String read(Model model)
 	{
 		model.addAttribute("pt",new RouteInformationDto());
 		return "index";
 	}
-    
-	@RequestMapping(value="/routing",method=RequestMethod.GET)
+    @RequestMapping(value="/routing",method=RequestMethod.GET)
 	public String load(@ModelAttribute("pt") RouteInformationDto pt, BindingResult errors, Model model)
     {
 		//System.out.println(pt.toString());
@@ -36,7 +34,6 @@ public class mapControl {
 	model.addAttribute("route",res);
    	return "index";
 	}
-    
     @RequestMapping(value = "/traffic", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public trafficdat show()

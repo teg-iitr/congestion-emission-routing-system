@@ -26,7 +26,7 @@ public class AirQualityDto {
 	private Lock writeLock;
 	private ArrayList<airQuality> ap;
 	private final GraphHopper hopper;
-	private final String url = "https://api.waqi.info/map/bounds/?latlng=28.5571231169,77.3900417514,28.7009665922,77.1195034214&token=25fe488654ba5a53ed760d2e0ac66b421255aeb5";
+	private final String url = "https://api.waqi.info/map/bounds/?latlng=28.5571231169,77.3900417514,28.7009665922,77.1195034214&token=<AQI-API-KEY>";
 	private airQualityBFS trav;
 	public AirQualityDto(GraphHopper hopper, Lock lock) {
 		this.hopper = hopper;

@@ -2,7 +2,6 @@
 Making an ajax call request to fetch traffic information from backend to be fetched andr rendered every 10 minutes
 */
 roadsJson = {};
-
 function traffic_info() {
     var checkbox = document.getElementById("traffic_disp");
     if (checkbox.checked == false) {

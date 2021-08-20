@@ -32,7 +32,7 @@ public class TrafficAndRoutingService {
 	
 	private final GraphHopper gh;
 	private static final String MAP_URL="maps/NewDelhi.osm.pbf";
-	private String apiKey="1c78c959-7a2e-486b-b674-3df4ab665884";
+	private String apiKey="<GH-API-KEY>";
 	private AirQualityDto ai;
 	private TrafficdatDto dt;
 	private routePathDto rp;

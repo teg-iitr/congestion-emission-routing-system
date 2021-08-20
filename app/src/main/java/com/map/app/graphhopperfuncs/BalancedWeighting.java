@@ -45,7 +45,6 @@ public class BalancedWeighting extends FastestWeighting {
     static double checkBounds(String key, double val, double from, double to) {
         if (val < from || val > to)
             throw new IllegalArgumentException(key + " has invalid range should be within [" + from + ", " + to + "]");
-
         return val;
     }
     @Override

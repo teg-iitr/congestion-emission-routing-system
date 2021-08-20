@@ -1,4 +1,5 @@
 //Converting string to normal case i.e title case like "I am" instead of "i am"
+
 function toTitleCase(str) {
     return str.replace(
         /\w\S*/g,

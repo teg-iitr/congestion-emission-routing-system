@@ -1,4 +1,3 @@
-
 if(typeof(L) !== 'undefined') {
 	/**
 	 * full canvas layer implementation for Leaflet

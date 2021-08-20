@@ -32,7 +32,6 @@ public class MyWeightingFactory implements WeightingFactory{
     }
 	@Override
 	public Weighting createWeighting(Profile profile, PMap requestHints, boolean disableTurnCosts) {
-		// TODO Auto-generated method stub
 		// Merge profile hints with request hints, the request hints take precedence.
         // Note that so far we do not check if overwriting the profile hints actually works with the preparation
         // for LM/CH. Later we should also limit the number of parameters that can be used to modify the profile.

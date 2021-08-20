@@ -41,6 +41,7 @@ public class airQuality {
 	}
 
 	public void setStationName(String stationName) {
+		
 		this.stationName = stationName;
 	}
 

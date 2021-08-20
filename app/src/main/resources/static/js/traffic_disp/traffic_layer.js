@@ -1,3 +1,4 @@
+
 var TrafficJamLayer = L.CanvasLayer.extend({
     clear: function() {
         var canvas = this.getCanvas();

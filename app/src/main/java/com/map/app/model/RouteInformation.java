@@ -1,7 +1,6 @@
 package com.map.app.model;
 
 import com.map.app.dto.RouteInformationDto;
-
 public class RouteInformation {
 	private float Startlat;
 	private float Startlon;

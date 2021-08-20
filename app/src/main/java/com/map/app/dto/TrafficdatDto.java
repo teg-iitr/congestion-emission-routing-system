@@ -40,7 +40,7 @@ public class TrafficdatDto {
 	}
 
 	public void fetchData() {
-		final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey=k7ZOxIxQR4lqqxAWR-d0CPvza3t9wX-RU49D9NmZ7U4&bbox=28.5571231169,77.3900417514;28.7009665922,77.1195034214&responseattributes=sh,fc&units=metric";
+		final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey=<HERE MAPS-API-KEY>&bbox=28.5571231169,77.3900417514;28.7009665922,77.1195034214&responseattributes=sh,fc&units=metric";
 		parse_XML(URL);
 	}
 

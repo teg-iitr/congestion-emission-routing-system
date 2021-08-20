@@ -18,15 +18,12 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import com.map.app.service.TrafficAndRoutingService;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
 public class AppApplication {
-
 	@Autowired
 	TrafficAndRoutingService ts;
-    
-	public static void main(String[] args) {
+   public static void main(String[] args) {
 		
 			SpringApplication.run(AppApplication.class, args);
 	}
-	
 	@Scheduled(fixedDelay=60*60*1000)
 	void jobInitializer()
 	{

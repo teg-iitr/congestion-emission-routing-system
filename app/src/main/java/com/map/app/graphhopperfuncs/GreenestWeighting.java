@@ -23,22 +23,17 @@ public class GreenestWeighting extends AbstractWeighting {
 		smokeEnc=flagEncoder.getDecimalEncodedValue("smoke");
 	    avgSpeedEnc=flagEncoder.getAverageSpeedEnc();
     }
-
-	
 	@Override
 	public double getMinWeight(double distance) {
 		return distance;
 	}
-
 	@Override
 	public String getName() {
 		return NAME;
 	}
-
 	@Override
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
 		double smokeValue=edgeState.get(smokeEnc);
 		return smokeValue;
 	}
-
 }

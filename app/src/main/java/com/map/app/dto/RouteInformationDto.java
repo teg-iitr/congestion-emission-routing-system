@@ -47,7 +47,7 @@ public class RouteInformationDto {
 	}
 	@Override
 	public String toString() {
-		return "RouteInformationDto [StartLoc=" + StartLoc + ", EndLoc=" + EndLoc + ", RouteType=" + RouteType +
+		return "RouteInformationDto [ StartLoc=" + StartLoc + ", EndLoc=" + EndLoc + ", RouteType=" + RouteType +
 			", Vehicle=" + Vehicle + "]";
 	}
 
