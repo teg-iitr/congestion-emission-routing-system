@@ -1,9 +1,5 @@
 package com.map.app;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import com.map.app.service.TrafficAndRoutingService;
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
 public class AppApplication {
 	@Autowired
@@ -37,5 +34,5 @@ public class AppApplication {
 @EnableScheduling
 class SchedulingConfiguration
 {
-	
+
 }

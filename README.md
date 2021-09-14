@@ -9,3 +9,4 @@ In order to use the above project,
 Note: Acquire API token for Graphhopper and Here Maps Api usage. <br>
 Go to gh_configured_router->src/main/java->com.map.app.dto-> routePathDto.java and set variable apiKey you graphhopper Api key(line 22).<br> Similarily, go to gh_configured_router->src/main/java->com.map.app.dto-> TrafficdatDto.java and add api token in the string variable URL is assigned to(43 line).
 
+

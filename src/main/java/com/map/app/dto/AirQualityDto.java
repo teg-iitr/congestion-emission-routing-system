@@ -9,37 +9,44 @@ import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.graphhopper.util.shapes.BBox;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import com.graphhopper.GraphHopper;
-import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.index.LocationIndex;
-import com.graphhopper.storage.index.Snap;
-import com.map.app.graphhopperfuncs.airQualityBFS;
+import com.map.app.graphhopperfuncs.AirQualityBFS;
 import com.map.app.model.airQuality;
 
+/**
+ * @author Siftee, Amit
+ */
+
 public class AirQualityDto {
-	private JSONParser jsonP;
-	private Lock writeLock;
-	private ArrayList<airQuality> ap;
+	private final JSONParser jsonP;
+	private final Lock writeLock;
+	private final ArrayList<airQuality> ap;
 	private final GraphHopper hopper;
-	private final String url = "https://api.waqi.info/map/bounds/?latlng=28.5571231169,77.3900417514,28.7009665922,77.1195034214&token=<AQI-API-KEY>";
-	private airQualityBFS trav;
+	private final String aqiApiKey = System.getenv("waqi_api_key");
+	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
+
 	public AirQualityDto(GraphHopper hopper, Lock lock) {
 		this.hopper = hopper;
 		this.jsonP = new JSONParser();
 		this.ap = new ArrayList<>();
 		this.writeLock = lock;
 	}
-	public void readJSON() {
+	public void readJSON(BBox boundingBox) {
 		/*
 		 Fetching the content from the api and parsing the json result
 		 */
+		if (aqiApiKey==null){
+			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
+		}
 		try {
-			URL uri = new URL(url);
+			URL uri = new URL(url+boundingBox.minLat+","+boundingBox.minLon + ","
+					+ boundingBox.maxLat + "," + boundingBox.maxLon +"&token=" + aqiApiKey );
 			HttpURLConnection con = (HttpURLConnection) uri.openConnection();
 			int responseCode = con.getResponseCode();
 			if (responseCode != 200) {
@@ -89,7 +96,7 @@ public class AirQualityDto {
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 			LocationIndex locationIndex = hopper.getLocationIndex();
-			trav = new airQualityBFS(hopper, gh, ap);
+			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
 			writeLock.lock();
 			try {
 				trav.start(gh.createEdgeExplorer(), 0);

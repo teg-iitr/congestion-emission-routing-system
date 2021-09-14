@@ -10,6 +10,8 @@ import java.util.concurrent.locks.Lock;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import com.graphhopper.util.shapes.BBox;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,8 +19,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.ev.IntEncodedValue;
-import com.graphhopper.routing.ev.UnsignedIntEncodedValue;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.Graph;
@@ -26,6 +26,10 @@ import com.graphhopper.storage.index.LocationIndex;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import com.map.app.model.trafficdat;
+
+/**
+ * @author  Siftee, Amit
+ */
 public class TrafficdatDto {
 	private trafficdat dt = new trafficdat();
 	private static final String[] encoders = {
@@ -39,8 +43,12 @@ public class TrafficdatDto {
 		this.writeLock = lock;
 	}
 
-	public void fetchData() {
-		final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey=<HERE MAPS-API-KEY>&bbox=28.5571231169,77.3900417514;28.7009665922,77.1195034214&responseattributes=sh,fc&units=metric";
+	public void fetchData(String apiKey, BBox boundingBox) {
+		final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey="
+				+apiKey +"&bbox=" +
+				+boundingBox.minLat+","+boundingBox.minLon + ";"
+				+ boundingBox.maxLat + "," + boundingBox.maxLon +
+				"&responseattributes=sh,fc&units=metric";
 		parse_XML(URL);
 	}
 
@@ -61,7 +69,7 @@ public class TrafficdatDto {
 			LocationIndex locationIndex = hopper.getLocationIndex();
 			int errors = 0;
 			int updates = 0;
-			Set<Integer> edgeIds = new HashSet<Integer> ();
+			Set<Integer> edgeIds = new HashSet<> ();
 			for (int i = 0; i<dt.getLat().size(); i++) {
 				List<Float> entryLats = dt.getLat().get(i);
 				List<Float> entryLons = dt.getLons().get(i);
@@ -87,16 +95,7 @@ public class TrafficdatDto {
 				double oldValue = edge.get(avgSpeedEnc);
 				if (value != oldValue) {
 					updates++;
-					// System.out.println(oldValue + ", new:" + value);
-					if (value<= avgSpeedEnc.getMaxDecimal()) {
-						edge.set(avgSpeedEnc, value);
-					} else {
-						edge.set(avgSpeedEnc, avgSpeedEnc.getMaxDecimal());
-
-					}
-					//System.out.println("new Edge Speed value at "+edge+" " +edge.get(carEncoder.getAverageSpeedEnc()));
-					//System.out.println(edge.get(bikeEncoder.getAverageSpeedEnc())+" "+edge.get(avgSpeedEnc));
-
+					edge.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
 				}
 			}
 		}

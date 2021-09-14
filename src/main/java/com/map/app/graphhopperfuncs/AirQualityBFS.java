@@ -14,7 +14,7 @@ import com.graphhopper.util.SimpleIntDeque;
 import com.graphhopper.util.XFirstSearch;
 import com.map.app.model.airQuality;
 
-public class airQualityBFS extends XFirstSearch {
+public class AirQualityBFS extends XFirstSearch {
 	//does a BFS traversal and assigns edge with air quality value as average of aqi value of base and adjacent node.
 	private Graph gh;
 	private GraphHopper hopper;
@@ -22,7 +22,7 @@ public class airQualityBFS extends XFirstSearch {
 	private static final String[] encoders = {
 		"car", "bike", "foot"
 	};
-	public airQualityBFS(GraphHopper hopper, Graph gh, ArrayList<airQuality> ap) {
+	public AirQualityBFS(GraphHopper hopper, Graph gh, ArrayList<airQuality> ap) {
 		this.gh = gh;
 		this.hopper = hopper;
 		this.ap = ap;
