@@ -12,15 +12,15 @@ import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 import com.map.app.model.RouteInformation;
 import com.map.app.model.RoutePath;
+
+/**
+ * @author Siftee, Amit
+ */
 public class RoutePathDto {
-	private static final String MAP_URL = "maps/NewDelhi.osm.pbf";
-	private String apiKey = "<GH-API-KEY>";
-	private GraphHopper gh;
-	private Lock readLock;
-	private TrafficdatDto dt;
-	private InstructionList list;
-	public RoutePathDto(TrafficdatDto dt, GraphHopper hopper, Lock readLock) {
-		this.dt = dt;
+	private final GraphHopper gh;
+	private final Lock readLock;
+
+	public RoutePathDto(GraphHopper hopper, Lock readLock) {
 		this.gh = hopper;
 		this.readLock = readLock;
 	}
@@ -57,8 +57,8 @@ public class RoutePathDto {
 			} else {
 				profile = "greenest_foot";
 			}
-
 		}
+
 		//making request
 		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);;
 		PointList pl = new PointList();
@@ -72,7 +72,7 @@ public class RoutePathDto {
 			ResponsePath res = fullRes.getBest();
 			System.out.println("Distance in meters: " + res.getDistance());
 			System.out.println("Time in minutes: " + res.getTime() / 60000);
-			list = res.getInstructions();
+			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
 					String navIns = ele.getTurnDescription(list.getTr()) + ",covering about " + ele.getDistance() + " meters";

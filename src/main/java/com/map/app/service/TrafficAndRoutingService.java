@@ -31,7 +31,7 @@ public class TrafficAndRoutingService {
 	private final ReadWriteLock lock;
 	
 	private final GraphHopper gh;
-	private static final String MAP_URL="maps/NewDelhi.osm.pbf";
+	private static final String MAP_URL="maps/planet_77.734,29.841_78.327,30.369.osm.pbf";
 	private final String apiKey=System.getenv("here_api_key");
 	private final AirQualityDto ai;
 	private final TrafficdatDto dt;
@@ -77,7 +77,7 @@ public class TrafficAndRoutingService {
     	gh.importOrLoad();
     	this.boundingBox = gh.getGraphHopperStorage().getBaseGraph().getBounds();
     	dt=new TrafficdatDto(gh,lock.writeLock());
-    	rp=new RoutePathDto(dt,gh,lock.readLock());
+    	rp=new RoutePathDto(gh, lock.readLock());
     	ai=new AirQualityDto(gh,lock.writeLock());
     }
 	

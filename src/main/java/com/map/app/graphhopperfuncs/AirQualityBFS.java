@@ -65,7 +65,8 @@ public class AirQualityBFS extends XFirstSearch {
 					double adj_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adj_lat, adj_lon);
 					EdgeIteratorState edge = gh.getEdgeIteratorState(iter.getEdge(), Integer.MIN_VALUE);
-					edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
+//					edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
+					edge.set(smokeEnc, 0.);
 				}
 				if (checkAdjacent(iter) && !visited.contains(connectedId)) {
 					visited.add(connectedId);
