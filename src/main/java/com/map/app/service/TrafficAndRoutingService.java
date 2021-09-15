@@ -1,6 +1,5 @@
 package com.map.app.service;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.graphhopper.util.shapes.BBox;
-import com.map.app.AppApplication;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.GraphHopperConfig;
@@ -18,11 +15,11 @@ import com.graphhopper.config.Profile;
 import com.graphhopper.routing.ev.UnsignedDecimalEncodedValue;
 import com.map.app.dto.AirQualityDto;
 import com.map.app.dto.TrafficdatDto;
-import com.map.app.dto.routePathDto;
+import com.map.app.dto.RoutePathDto;
 import com.map.app.graphhopperfuncs.MyGraphHopper;
 import com.map.app.model.RouteInformation;
-import com.map.app.model.routePath;
-import com.map.app.model.trafficdat;
+import com.map.app.model.RoutePath;
+import com.map.app.model.Trafficdat;
 
 /**
  * @author Siftee, Amit
@@ -38,7 +35,7 @@ public class TrafficAndRoutingService {
 	private final String apiKey=System.getenv("here_api_key");
 	private final AirQualityDto ai;
 	private final TrafficdatDto dt;
-	private final routePathDto rp;
+	private final RoutePathDto rp;
 	private final BBox boundingBox;
 	
     public TrafficAndRoutingService()
@@ -80,11 +77,11 @@ public class TrafficAndRoutingService {
     	gh.importOrLoad();
     	this.boundingBox = gh.getGraphHopperStorage().getBaseGraph().getBounds();
     	dt=new TrafficdatDto(gh,lock.writeLock());
-    	rp=new routePathDto(dt,gh,lock.readLock());
+    	rp=new RoutePathDto(dt,gh,lock.readLock());
     	ai=new AirQualityDto(gh,lock.writeLock());
     }
 	
-    public trafficdat getAll()
+    public Trafficdat getAll()
 	{
 		return dt.getRoads();
 	}
@@ -98,7 +95,7 @@ public class TrafficAndRoutingService {
 		ai.readJSON(this.boundingBox);
 	}
 
-	public routePath getPath(RouteInformation p)
+	public RoutePath getPath(RouteInformation p)
 	{
 		return rp.find(p);
 	}

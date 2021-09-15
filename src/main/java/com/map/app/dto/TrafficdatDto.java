@@ -25,13 +25,13 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.index.LocationIndex;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
-import com.map.app.model.trafficdat;
+import com.map.app.model.Trafficdat;
 
 /**
  * @author  Siftee, Amit
  */
 public class TrafficdatDto {
-	private trafficdat dt = new trafficdat();
+	private Trafficdat dt = new Trafficdat();
 	private static final String[] encoders = {
 		"car", "bike", "foot"
 	};
@@ -52,7 +52,7 @@ public class TrafficdatDto {
 		parse_XML(URL);
 	}
 
-	public void feed(trafficdat tempdt) {
+	public void feed(Trafficdat tempdt) {
 		writeLock.lock();
 		try {
 			lockedFeed(tempdt);
@@ -61,7 +61,7 @@ public class TrafficdatDto {
 		}
 	}
 
-	private void lockedFeed(trafficdat tempdt) {
+	private void lockedFeed(Trafficdat tempdt) {
 		this.dt = tempdt;
 		Graph graph = hopper.getGraphHopperStorage().getBaseGraph();
 		for (String Encoder: encoders) {
@@ -109,7 +109,7 @@ public class TrafficdatDto {
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new URL(Url).openStream());
 			NodeList roads = doc.getElementsByTagName("FI");
-			trafficdat tempdt = new trafficdat();
+			Trafficdat tempdt = new Trafficdat();
 			tempdt.setSpeed(new ArrayList<>());
 			tempdt.setLat(new ArrayList<>());
 			tempdt.setLons(new ArrayList<>());
@@ -199,7 +199,7 @@ public class TrafficdatDto {
 		}
 
 	}
-	public trafficdat getRoads() {
+	public Trafficdat getRoads() {
 		return dt;
 	}
 

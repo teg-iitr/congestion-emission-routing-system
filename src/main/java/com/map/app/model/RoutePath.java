@@ -3,7 +3,7 @@ package com.map.app.model;
 import java.util.ArrayList;
 
 import com.graphhopper.util.PointList;
-public class routePath {
+public class RoutePath {
 	private ArrayList<Float> lats;
 	private ArrayList<Float> longs;
 	private ArrayList<String> navigationInstruction;
@@ -26,7 +26,7 @@ public class routePath {
 	public void setLongs(ArrayList<Float> longs) {
 		this.longs = longs;
 	}
-	public routePath() {
+	public RoutePath() {
 		lats = new ArrayList<>();
 		longs = new ArrayList<>();
 	}

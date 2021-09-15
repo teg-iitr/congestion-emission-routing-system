@@ -10,14 +10,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.map.app.dto.RouteInformationDto;
 import com.map.app.model.RouteInformation;
-import com.map.app.model.routePath;
-import com.map.app.model.trafficdat;
+import com.map.app.model.RoutePath;
+import com.map.app.model.Trafficdat;
 import com.map.app.service.TrafficAndRoutingService;
 
 @Controller
-public class mapControl {
+public class MapControl {
 	@Autowired
 	TrafficAndRoutingService trs;
+
 	@GetMapping(value="/")
 	public String read(Model model)
 	{
@@ -29,14 +30,14 @@ public class mapControl {
     {
 		//System.out.println(pt.toString());
 		RouteInformation rp=pt.conv();
-	routePath res=trs.getPath(rp);
+	RoutePath res=trs.getPath(rp);
 	//System.out.println(res.getNavigationInstruction());
 	model.addAttribute("route",res);
    	return "index";
 	}
     @RequestMapping(value = "/traffic", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public trafficdat show()
+    public Trafficdat show()
     {
     return trs.getAll();	
     }

@@ -13,6 +13,10 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import com.map.app.service.TrafficAndRoutingService;
 
+/**
+ * @author Siftee
+ */
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
 public class AppApplication {
 	@Autowired

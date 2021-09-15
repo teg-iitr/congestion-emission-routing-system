@@ -6,36 +6,31 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
-import com.graphhopper.config.Profile;
-import com.graphhopper.reader.osm.GraphHopperOSM;
-import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.util.FlagEncoder;
-import com.graphhopper.routing.util.FlagEncoderFactory;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 import com.map.app.model.RouteInformation;
-import com.map.app.model.routePath;
-public class routePathDto {
+import com.map.app.model.RoutePath;
+public class RoutePathDto {
 	private static final String MAP_URL = "maps/NewDelhi.osm.pbf";
 	private String apiKey = "<GH-API-KEY>";
 	private GraphHopper gh;
 	private Lock readLock;
 	private TrafficdatDto dt;
 	private InstructionList list;
-	public routePathDto(TrafficdatDto dt, GraphHopper hopper, Lock readLock) {
+	public RoutePathDto(TrafficdatDto dt, GraphHopper hopper, Lock readLock) {
 		this.dt = dt;
 		this.gh = hopper;
 		this.readLock = readLock;
 	}
 
-	public routePath find(RouteInformation p) {
+	public RoutePath find(RouteInformation p) {
 		//routing result for given route information
 		this.readLock.lock();
 		String profile = "";
 		//fetching the profile to do routing with
-		routePath result = new routePath();
+		RoutePath result = new RoutePath();
 		if (p.getVehicle().equals("car")) {
 			if (p.getRouteType().equals("fastest")) {
 				profile = "fastest_car";

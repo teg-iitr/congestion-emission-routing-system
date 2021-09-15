@@ -17,7 +17,7 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.index.LocationIndex;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
-import com.map.app.model.airQuality;
+import com.map.app.model.AirQuality;
 
 /**
  * @author Siftee, Amit
@@ -26,7 +26,7 @@ import com.map.app.model.airQuality;
 public class AirQualityDto {
 	private final JSONParser jsonP;
 	private final Lock writeLock;
-	private final ArrayList<airQuality> ap;
+	private final ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
 	private final String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
@@ -90,7 +90,7 @@ public class AirQualityDto {
 					double aqi = Double.parseDouble(aq);
 					JSONObject obj2 = (JSONObject) obj1.get("station");
 					String name = (String) obj2.get("name");
-					ap.add(new airQuality(lat, lon, aqi, name));
+					ap.add(new AirQuality(lat, lon, aqi, name));
 				}
 			}
 			//assign air quality metric to edge in graphhopper
