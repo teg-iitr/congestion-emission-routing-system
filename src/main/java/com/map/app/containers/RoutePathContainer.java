@@ -1,4 +1,4 @@
-package com.map.app.dto;
+package com.map.app.containers;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.Lock;
@@ -10,55 +10,34 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
-import com.map.app.model.RouteInformation;
+import com.map.app.model.UrlContainer;
 import com.map.app.model.RoutePath;
+import com.map.app.service.PathChoice;
+import com.map.app.service.TrafficAndRoutingService;
+import com.map.app.service.TransportMode;
 
 /**
  * @author Siftee, Amit
  */
-public class RoutePathDto {
+public class RoutePathContainer {
 	private final GraphHopper gh;
 	private final Lock readLock;
 
-	public RoutePathDto(GraphHopper hopper, Lock readLock) {
+	public RoutePathContainer(GraphHopper hopper, Lock readLock) {
 		this.gh = hopper;
 		this.readLock = readLock;
 	}
 
-	public RoutePath find(RouteInformation p) {
+	public RoutePath find(UrlContainer p) {
 		//routing result for given route information
 		this.readLock.lock();
-		String profile = "";
+
 		//fetching the profile to do routing with
+		TransportMode mode = TransportMode.valueOf(p.getVehicle());
+		PathChoice pathChoice = PathChoice.valueOf(p.getRouteType());
+		String profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice,mode);
+
 		RoutePath result = new RoutePath();
-		if (p.getVehicle().equals("car")) {
-			if (p.getRouteType().equals("fastest")) {
-				profile = "fastest_car";
-			} else if (p.getRouteType().equals("balanced")) {
-				profile = "balanced_car";
-			} else {
-				profile = "greenest_car";
-			}
-
-		} else if (p.getVehicle().equals("bike")) {
-			if (p.getRouteType().equals("fastest")) {
-				profile = "fastest_bike";
-			} else if (p.getRouteType().equals("balanced")) {
-				profile = "balanced_bike";
-			} else {
-				profile = "greenest_bike";
-			}
-
-		} else if (p.getVehicle().equals("foot")) {
-			if (p.getRouteType().equals("fastest")) {
-				profile = "fastest_foot";
-			} else if (p.getRouteType().equals("balanced")) {
-				profile = "balanced_foot";
-			} else {
-				profile = "greenest_foot";
-			}
-		}
-
 		//making request
 		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);;
 		PointList pl = new PointList();
@@ -71,7 +50,7 @@ public class RoutePathDto {
 			}
 			ResponsePath res = fullRes.getBest();
 			System.out.println("Distance in meters: " + res.getDistance());
-			System.out.println("Time in minutes: " + res.getTime() / 60000);
+			System.out.println("Time in minutes: " + res.getTime() / (60.*1000.));
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
@@ -86,7 +65,6 @@ public class RoutePathDto {
 		} finally {
 			result.fillPath(pl, ins);
 			readLock.unlock();
-
 		}
 		return result; //result contains latitudes and longitudes of route and instructions for navigation
 

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.map.app.dto.RouteInformationDto;
-import com.map.app.model.RouteInformation;
+import com.map.app.containers.UrlTransformer;
+import com.map.app.model.UrlContainer;
 import com.map.app.model.RoutePath;
-import com.map.app.model.Trafficdat;
+import com.map.app.model.TrafficData;
 import com.map.app.service.TrafficAndRoutingService;
 
 @Controller
@@ -22,14 +22,14 @@ public class MapControl {
 	@GetMapping(value="/")
 	public String read(Model model)
 	{
-		model.addAttribute("pt",new RouteInformationDto());
+		model.addAttribute("pt",new UrlTransformer());
 		return "index";
 	}
     @RequestMapping(value="/routing",method=RequestMethod.GET)
-	public String load(@ModelAttribute("pt") RouteInformationDto pt, BindingResult errors, Model model)
+	public String load(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
     {
 		//System.out.println(pt.toString());
-		RouteInformation rp=pt.conv();
+		UrlContainer rp=pt.convert();
 	RoutePath res=trs.getPath(rp);
 	//System.out.println(res.getNavigationInstruction());
 	model.addAttribute("route",res);
@@ -37,7 +37,7 @@ public class MapControl {
 	}
     @RequestMapping(value = "/traffic", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Trafficdat show()
+    public TrafficData show()
     {
     return trs.getAll();	
     }

@@ -1,8 +1,8 @@
-package com.map.app.dto;
+package com.map.app.containers;
 
-import com.map.app.model.RouteInformation;
+import com.map.app.model.UrlContainer;
 
-public class RouteInformationDto {
+public class UrlTransformer {
 	private String StartLoc;
 	private String EndLoc;
 	private String RouteType;
@@ -32,9 +32,10 @@ public class RouteInformationDto {
 	public void setVehicle(String vehicle) {
 		Vehicle = vehicle;
 	}
-	public RouteInformation conv() {
+
+	public UrlContainer convert() {
 		//converting dto layer to model layer
-		RouteInformation rp = new RouteInformation();
+		UrlContainer rp = new UrlContainer();
 		String[] startCoords = this.getStartLoc().split(",");
 		String[] endCoords = this.getEndLoc().split(",");
 		rp.setStartlat(Float.parseFloat(startCoords[1]));
@@ -45,6 +46,7 @@ public class RouteInformationDto {
 		rp.setVehicle(this.getVehicle());
 		return rp;
 	}
+
 	@Override
 	public String toString() {
 		return "RouteInformationDto [ StartLoc=" + StartLoc + ", EndLoc=" + EndLoc + ", RouteType=" + RouteType +

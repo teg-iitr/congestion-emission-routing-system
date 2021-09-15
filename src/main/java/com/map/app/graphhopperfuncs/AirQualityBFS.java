@@ -13,15 +13,16 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.SimpleIntDeque;
 import com.graphhopper.util.XFirstSearch;
 import com.map.app.model.AirQuality;
+import com.map.app.service.TransportMode;
 
+/**
+ * @author Siftee, Author
+ */
 public class AirQualityBFS extends XFirstSearch {
 	//does a BFS traversal and assigns edge with air quality value as average of aqi value of base and adjacent node.
-	private Graph gh;
-	private GraphHopper hopper;
-	private ArrayList<AirQuality> ap;
-	private static final String[] encoders = {
-		"car", "bike", "foot"
-	};
+	private final Graph gh;
+	private final GraphHopper hopper;
+	private final ArrayList<AirQuality> ap;
 	public AirQualityBFS(GraphHopper hopper, Graph gh, ArrayList<AirQuality> ap) {
 		this.gh = gh;
 		this.hopper = hopper;
@@ -34,8 +35,8 @@ public class AirQualityBFS extends XFirstSearch {
 
 	@Override
 	public void start(EdgeExplorer explorer, int temp) {
-		for (String encoder: encoders) {
-			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder);
+		for (TransportMode encoder: TransportMode.values()) {
+			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
 			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
 			SimpleIntDeque fifo = new SimpleIntDeque();
 			GHBitSet visited = createBitSet();
@@ -43,12 +44,12 @@ public class AirQualityBFS extends XFirstSearch {
 				if (!visited.contains(startNode)) {
 					visited.add(startNode);
 					fifo.push(startNode);
-					BFS(explorer, startNode, visited, fifo, Encoder, smokeEnc);
+					BFS(explorer, visited, fifo, smokeEnc);
 				}
 			}
 		}
 	}
-	private void BFS(EdgeExplorer explorer, int startNode, GHBitSet visited, SimpleIntDeque fifo, FlagEncoder Encoder, DecimalEncodedValue smokeEnc) {
+	private void BFS(EdgeExplorer explorer, GHBitSet visited, SimpleIntDeque fifo, DecimalEncodedValue smokeEnc) {
 		int current;
 		while (!fifo.isEmpty()) {
 			current = fifo.pop();
@@ -65,8 +66,12 @@ public class AirQualityBFS extends XFirstSearch {
 					double adj_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adj_lat, adj_lon);
 					EdgeIteratorState edge = gh.getEdgeIteratorState(iter.getEdge(), Integer.MIN_VALUE);
-//					edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
-					edge.set(smokeEnc, 0.);
+
+					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
+						edge.set(smokeEnc, 0.);
+					} else {
+						edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
+					}
 				}
 				if (checkAdjacent(iter) && !visited.contains(connectedId)) {
 					visited.add(connectedId);
@@ -75,6 +80,7 @@ public class AirQualityBFS extends XFirstSearch {
 			}
 		}
 	}
+
 	private double IDW(double fromlat, double fromlon) {
 		double numer = 0;
 		double denom = 0;

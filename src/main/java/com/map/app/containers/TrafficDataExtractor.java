@@ -1,4 +1,4 @@
-package com.map.app.dto;
+package com.map.app.containers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import com.graphhopper.util.shapes.BBox;
+import com.map.app.service.TransportMode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,20 +26,17 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.index.LocationIndex;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
-import com.map.app.model.Trafficdat;
+import com.map.app.model.TrafficData;
 
 /**
  * @author  Siftee, Amit
  */
-public class TrafficdatDto {
-	private Trafficdat dt = new Trafficdat();
-	private static final String[] encoders = {
-		"car", "bike", "foot"
-	};
+public class TrafficDataExtractor {
+	private TrafficData dt = new TrafficData();
 
 	private final Lock writeLock;
 	private final GraphHopper hopper;
-	public TrafficdatDto(GraphHopper hopper, Lock lock) {
+	public TrafficDataExtractor(GraphHopper hopper, Lock lock) {
 		this.hopper = hopper;
 		this.writeLock = lock;
 	}
@@ -52,7 +50,7 @@ public class TrafficdatDto {
 		parse_XML(URL);
 	}
 
-	public void feed(Trafficdat tempdt) {
+	public void feed(TrafficData tempdt) {
 		writeLock.lock();
 		try {
 			lockedFeed(tempdt);
@@ -61,11 +59,11 @@ public class TrafficdatDto {
 		}
 	}
 
-	private void lockedFeed(Trafficdat tempdt) {
+	private void lockedFeed(TrafficData tempdt) {
 		this.dt = tempdt;
 		Graph graph = hopper.getGraphHopperStorage().getBaseGraph();
-		for (String Encoder: encoders) {
-			FlagEncoder encoder = hopper.getEncodingManager().getEncoder(Encoder);
+		for (TransportMode mode: TransportMode.values()) {
+			FlagEncoder encoder = hopper.getEncodingManager().getEncoder(mode.toString());
 			LocationIndex locationIndex = hopper.getLocationIndex();
 			int errors = 0;
 			int updates = 0;
@@ -99,7 +97,6 @@ public class TrafficdatDto {
 				}
 			}
 		}
-
 	}
 
 	private void parse_XML(String Url) {
@@ -109,7 +106,7 @@ public class TrafficdatDto {
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new URL(Url).openStream());
 			NodeList roads = doc.getElementsByTagName("FI");
-			Trafficdat tempdt = new Trafficdat();
+			TrafficData tempdt = new TrafficData();
 			tempdt.setSpeed(new ArrayList<>());
 			tempdt.setLat(new ArrayList<>());
 			tempdt.setLons(new ArrayList<>());
@@ -199,7 +196,7 @@ public class TrafficdatDto {
 		}
 
 	}
-	public Trafficdat getRoads() {
+	public TrafficData getRoads() {
 		return dt;
 	}
 

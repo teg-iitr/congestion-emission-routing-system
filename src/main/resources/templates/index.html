@@ -92,6 +92,7 @@
    </body>
    <script type="text/javascript" th:inline="javascript">
       //Creating leaflet map and adding tile layer
+      // TODO the map view must change based on the OSM file.
       var map = L.map('mapid').setView([28.7041, 77.1025], 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,

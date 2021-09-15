@@ -1,10 +1,14 @@
 package com.map.app.model;
 
+/**
+ * @author Siftee
+ */
 public class AirQuality {
 	private double lat;
 	private double lon;
 	private double aqi;
 	private String stationName;
+
 	public AirQuality(double lat, double lon, double aqi, String name) {
 		this.lat = lat;
 		this.lon = lon;

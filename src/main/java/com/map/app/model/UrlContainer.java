@@ -1,7 +1,6 @@
 package com.map.app.model;
 
-import com.map.app.dto.RouteInformationDto;
-public class RouteInformation {
+public class UrlContainer {
 	private float Startlat;
 	private float Startlon;
 	private float Endlat;
@@ -44,6 +43,7 @@ public class RouteInformation {
 	public void setEndlon(float endlon) {
 		Endlon = endlon;
 	}
+
 	public String toString() {
 		return Startlat + " " + Startlon + " " + Endlat + " " + Endlon + " " + Vehicle + " " + RouteType;
 	}

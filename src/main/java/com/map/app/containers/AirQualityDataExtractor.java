@@ -1,4 +1,4 @@
-package com.map.app.dto;
+package com.map.app.containers;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,7 +15,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.Graph;
-import com.graphhopper.storage.index.LocationIndex;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
 import com.map.app.model.AirQuality;
 
@@ -23,7 +22,7 @@ import com.map.app.model.AirQuality;
  * @author Siftee, Amit
  */
 
-public class AirQualityDto {
+public class AirQualityDataExtractor {
 	private final JSONParser jsonP;
 	private final Lock writeLock;
 	private final ArrayList<AirQuality> ap;
@@ -31,7 +30,7 @@ public class AirQualityDto {
 	private final String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
 
-	public AirQualityDto(GraphHopper hopper, Lock lock) {
+	public AirQualityDataExtractor(GraphHopper hopper, Lock lock) {
 		this.hopper = hopper;
 		this.jsonP = new JSONParser();
 		this.ap = new ArrayList<>();
@@ -95,7 +94,7 @@ public class AirQualityDto {
 			}
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
-			LocationIndex locationIndex = hopper.getLocationIndex();
+//			LocationIndex locationIndex = hopper.getLocationIndex();
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
 			writeLock.lock();
 			try {
