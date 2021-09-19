@@ -31,14 +31,16 @@ public class TrafficAndRoutingService {
 	private final ReadWriteLock lock;
 	
 	private final GraphHopper gh;
-	private static final String MAP_URL="maps/planet_77.734,29.841_78.327,30.369.osm.pbf";
-	private final String apiKey=System.getenv("here_api_key");
+	//private static final String MAP_URL="maps/NewDelhi.osm.pbf";
+	private final String apiKey;
+	
 	private final AirQualityDataExtractor ai;
 	private final TrafficDataExtractor dt;
 	private final RoutePathContainer rp;
 	private final BBox boundingBox;
-	
-    public TrafficAndRoutingService()
+
+	public TrafficAndRoutingService()
+    
     {
     	lock=new ReentrantReadWriteLock();
     	GraphHopperConfig args=new GraphHopperConfig();
@@ -52,8 +54,8 @@ public class TrafficAndRoutingService {
     	Properties prop=new Properties();
 		try(FileInputStream ip = new FileInputStream("config.properties");) {
 			prop.load(ip);
-			System.out.println("Using OSM file "+ MAP_URL);
-			args.putObject("datareader.file",MAP_URL);
+			System.out.println("Using OSM file "+ prop.getProperty("datareader.file"));
+			args.putObject("datareader.file",prop.getProperty("datareader.file"));
 			List<Profile> profiles = new ArrayList<>();
 
 			for (PathChoice pc : PathChoice.values()) {
@@ -61,13 +63,15 @@ public class TrafficAndRoutingService {
 					profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
 				}
 			}
+			
 			args.setProfiles(profiles);
 			args.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
 			args.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
+			apiKey=prop.getProperty("here_api_key");
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
-    	gh.init(args).setOSMFile(MAP_URL).setGraphHopperLocation("graphLocation");
+    	gh.init(args).setGraphHopperLocation("graphLocation");
     	//System.out.println(gh.getEncodingManager().getDecimalEncodedValue("smoke"));
     	gh.clean();
     	gh.importOrLoad();
@@ -76,11 +80,19 @@ public class TrafficAndRoutingService {
     	rp=new RoutePathContainer(gh, lock.readLock());
     	ai=new AirQualityDataExtractor(gh,lock.writeLock());
     }
-
+	
 	public static String getModeBasedPathChoice(PathChoice pathChoice, TransportMode transportMode) {
 		return pathChoice.toString().concat("_").concat(transportMode.toString());
 	}
 	
+	public ArrayList<Float> getBoundingBox() {
+		ArrayList<Float> box=new ArrayList<>();
+		box.add((float)boundingBox.minLat);
+		box.add((float)boundingBox.minLon);
+		box.add((float) boundingBox.maxLat);
+		box.add((float)boundingBox.maxLon);
+		return box;
+	}
     public TrafficData getAll()
 	{
 		return dt.getRoads();
@@ -88,7 +100,7 @@ public class TrafficAndRoutingService {
 	
 	public void start()
 	{
-		if (apiKey==null){
+		if (apiKey.equals("<HERE_API_KEY>")){
 			throw new RuntimeException("API Key for Here Maps is not found. Aborting...");
 		}
 	    dt.fetchData(apiKey, this.boundingBox);

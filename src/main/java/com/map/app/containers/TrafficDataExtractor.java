@@ -93,6 +93,7 @@ public class TrafficDataExtractor {
 				double oldValue = edge.get(avgSpeedEnc);
 				if (value != oldValue) {
 					updates++;
+					
 					edge.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
 				}
 			}

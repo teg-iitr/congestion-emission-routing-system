@@ -14,31 +14,51 @@ import com.map.app.model.RoutePath;
 import com.map.app.model.TrafficData;
 import com.map.app.service.TrafficAndRoutingService;
 
+
 @Controller
 public class MapControl {
 	@Autowired
 	TrafficAndRoutingService trs;
-
+	
+	
+	
 	@GetMapping(value="/")
 	public String read(Model model)
 	{
 		model.addAttribute("pt",new UrlTransformer());
+		model.addAttribute("bbox",trs.getBoundingBox());
 		return "index";
 	}
-    @RequestMapping(value="/routing",method=RequestMethod.GET)
+    
+	@RequestMapping(value="/routing",method=RequestMethod.GET)
 	public String load(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
     {
-		//System.out.println(pt.toString());
-		UrlContainer rp=pt.convert();
+		
+    UrlContainer rp=pt.convert();
 	RoutePath res=trs.getPath(rp);
-	//System.out.println(res.getNavigationInstruction());
 	model.addAttribute("route",res);
+	model.addAttribute("bbox",res.getBounds());
    	return "index";
 	}
+	
+	@ResponseBody 
+	@RequestMapping(value = "/routing",method=RequestMethod.GET,produces="application/json")   
+	 public RoutePath fetchJSONResponse(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
+	 {
+		
+		 UrlContainer rp=pt.convert();
+		 RoutePath res=trs.getPath(rp);
+		 return res;
+	 }
+	
     @RequestMapping(value = "/traffic", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public TrafficData show()
     {
     return trs.getAll();	
     }
+    
+   
+    
+ 
 }

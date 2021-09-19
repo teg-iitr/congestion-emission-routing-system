@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org">
    <head>
       <meta charset='utf-8'>
       <title>N.S</title>
@@ -93,12 +93,14 @@
    <script type="text/javascript" th:inline="javascript">
       //Creating leaflet map and adding tile layer
       // TODO the map view must change based on the OSM file.
-      var map = L.map('mapid').setView([28.7041, 77.1025], 11);
+       var bbox=/*[[${bbox}]]*/"";
+      var map = L.map('mapid');
+      map.fitBounds([ [bbox[0],bbox[1]] , [bbox[2],bbox[3]]]);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
-      
+     
       /*
       Adjusting height of turn by turn navigation instruction box
       according to height of toggled state of main query box
@@ -146,7 +148,7 @@
       	      document.getElementById('hid2').value=e.result.center;
       	  console.log(document.getElementById('hid2').value);
       	})
-      	geocoder1._inputEl.addEventListener('input', function (e) { document.getElementById('inputbox2').style.visibility = "hidden"; });
+      geocoder1._inputEl.addEventListener('input', function (e) { document.getElementById('inputbox2').style.visibility = "hidden"; });
       geocoder1._inputEl.addEventListener('blur', function (e) { document.getElementById('inputbox2').style.visibility = "visible"; });
       
    </script>
@@ -168,9 +170,9 @@
       Display of routing results
       */      	
       function codeAddress() {
-      
+
+          
       	 var data=/*[[${route}]]*/"";
-      	 console.log(data);
       	 if(data!=null)
       		 {
       		 console.log(data);
@@ -185,29 +187,27 @@
       				colour='red';
       				}
       
-      			 for(let i=0;i<data.lats.length;i++)
+      			 for(let i=0;i<data.points.length;i++)
       			{
       				if(i==0)
       				{
-      					var start = L.marker([data.lats[i],data.longs[i]]).addTo(map);
+      					var start = L.marker([data.points[i].lat,data.points[i].lon]).addTo(map);
       					start.bindPopup("<b> Source </b>")
       				}
-      				if(i==data.lats.length-1)
+      				if(i==data.points.length-1)
       				{
-      					var end = L.marker([data.lats[i],data.longs[i]]).addTo(map);
+      					var end = L.marker([data.points[i].lat,data.points[i].lon]).addTo(map);
       					end.bindPopup("<b> Destination </b>")
       					break;
       				}
-      				var pointA=new L.LatLng(data.lats[i],data.longs[i]);
-      				var pointB=new L.LatLng(data.lats[i+1],data.longs[i+1]);
+      				var pointA=new L.LatLng(data.points[i].lat,data.points[i].lon);
+      				var pointB=new L.LatLng(data.points[i+1].lat,data.points[i+1].lon);
       				var pointList=[pointA,pointB];
       				var edge=new L.Polyline(pointList);
       				edge.setStyle({
       				    color: colour
       				});
-      				//console.log(document.getElementById('greenest').checked);
-      				
-      	            edge.addTo(map);
+      		        edge.addTo(map);
       			}
       			//creating and adding instruction box to inputbox for turn by turn instructions
       			var instructionBox=document.createElement('div');

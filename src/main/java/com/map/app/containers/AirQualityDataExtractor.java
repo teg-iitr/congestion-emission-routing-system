@@ -1,10 +1,14 @@
 package com.map.app.containers;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,9 +18,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import com.graphhopper.GraphHopper;
+import com.graphhopper.config.Profile;
 import com.graphhopper.storage.Graph;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
 import com.map.app.model.AirQuality;
+import com.map.app.service.PathChoice;
+import com.map.app.service.TrafficAndRoutingService;
+import com.map.app.service.TransportMode;
 
 /**
  * @author Siftee, Amit
@@ -27,7 +35,7 @@ public class AirQualityDataExtractor {
 	private final Lock writeLock;
 	private final ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
-	private final String aqiApiKey = System.getenv("waqi_api_key");
+	private final String aqiApiKey;
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
 
 	public AirQualityDataExtractor(GraphHopper hopper, Lock lock) {
@@ -35,12 +43,19 @@ public class AirQualityDataExtractor {
 		this.jsonP = new JSONParser();
 		this.ap = new ArrayList<>();
 		this.writeLock = lock;
+		Properties prop=new Properties();
+		try(FileInputStream ip = new FileInputStream("config.properties");) {
+			prop.load(ip);
+			aqiApiKey=prop.getProperty("waqi_api_key");
+		} catch (IOException e) {
+			throw new RuntimeException("Config.properties not found. Aborting ...");
+		}
 	}
 	public void readJSON(BBox boundingBox) {
 		/*
 		 Fetching the content from the api and parsing the json result
 		 */
-		if (aqiApiKey==null){
+		if (aqiApiKey.equals("<WAQI_API_KEY>")){
 			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
 		}
 		try {
@@ -57,7 +72,7 @@ public class AirQualityDataExtractor {
 			while ((inputLine = in .readLine()) != null) {
 				response.append(inputLine);
 			}
-			// System.out.println(response.toString());
+		//	 System.out.println(response.toString());
 			in .close();
 
 			JSONObject obj = (JSONObject) jsonP.parse(response.toString());

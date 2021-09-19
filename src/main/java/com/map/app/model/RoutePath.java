@@ -3,39 +3,56 @@ package com.map.app.model;
 import java.util.ArrayList;
 
 import com.graphhopper.util.PointList;
+import com.graphhopper.util.shapes.BBox;
+import com.graphhopper.util.shapes.GHPoint;
 public class RoutePath {
-	private ArrayList<Float> lats;
-	private ArrayList<Float> longs;
+	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;
-
+	private ArrayList<Float> bounds;
+	
+	public ArrayList<Float> getBounds() {
+		return bounds;
+	}
+	public void setBounds(ArrayList<Float> bounds) {
+		this.bounds = bounds;
+	}
+	
+	public ArrayList<GHPoint> getPoints() {
+		return points;
+	}
+	public void setPoints(ArrayList<GHPoint> points) {
+		this.points = points;
+	}
+	
 	public ArrayList<String> getNavigationInstruction() {
 		return navigationInstruction;
 	}
 	public void setNavigationInstruction(ArrayList<String> navigationInstruction) {
 		this.navigationInstruction = navigationInstruction;
 	}
-	public ArrayList<Float> getLats() {
-		return lats;
-	}
-	public void setLats(ArrayList<Float> lats) {
-		this.lats = lats;
-	}
-	public ArrayList<Float> getLongs() {
-		return longs;
-	}
-	public void setLongs(ArrayList<Float> longs) {
-		this.longs = longs;
-	}
 	public RoutePath() {
-		lats = new ArrayList<>();
-		longs = new ArrayList<>();
+		points = new ArrayList<>();
+		bounds=new ArrayList<>();
 	}
-	public void fillPath(PointList rp, ArrayList<String> ins) {
-
-		for (int i = 0; i<rp.size(); i++) {
-			lats.add((float) rp.getLat(i));
-			longs.add((float) rp.getLon(i));
+	
+	public BBox calcBBox2D(PointList pointList) {
+		  BBox bounds = BBox.createInverse(false);
+		  for (int i = 0; i < pointList.getSize(); i++) {
+		    bounds.update(pointList.getLat(i), pointList.getLon(i));
+		  }
+		 
+		  return bounds;
 		}
+	public void fillPath(PointList rp, ArrayList<String> ins) {
+		
+		for (int i = 0; i<rp.size(); i++) {
+			points.add(new GHPoint(rp.getLat(i),rp.getLon(i)));
+		}
+		BBox routeBB=calcBBox2D(rp);
+		bounds.add((float) routeBB.minLat);
+		bounds.add((float) routeBB.minLon);
+		bounds.add((float) routeBB.maxLat);
+		bounds.add((float) routeBB.maxLon);
 		navigationInstruction = ins;
 	}
 }
