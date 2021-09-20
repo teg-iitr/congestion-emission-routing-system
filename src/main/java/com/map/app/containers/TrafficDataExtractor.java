@@ -195,6 +195,10 @@ public class TrafficDataExtractor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		finally 
+		{
+			System.out.println("Traffic parsing done...");
+		}
 
 	}
 	public TrafficData getRoads() {

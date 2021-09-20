@@ -120,6 +120,10 @@ public class AirQualityDataExtractor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally 
+		{
+			System.out.println("WAQI API parsing done...");
+		}
 
 	}
 

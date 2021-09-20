@@ -13,14 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
 @Override
 public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 
-    //request parameter ("format" by default) should be used to determine the requested media type
-    configurer.favorParameter(true).
-    //the favour parameter is set to "mediaType" instead of default "format"
-    parameterName("mediaType").
-    //ignore the accept headers
-    ignoreAcceptHeader(true).
-    defaultContentType(MediaType.TEXT_HTML).
-    mediaType("html", MediaType.TEXT_HTML).
+    configurer.defaultContentType(MediaType.ALL).favorParameter(true).parameterName("mediaType").
     mediaType("json", MediaType.APPLICATION_JSON);
   }
 }

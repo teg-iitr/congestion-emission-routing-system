@@ -1,6 +1,7 @@
 package com.map.app.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.BBox;
@@ -9,6 +10,15 @@ public class RoutePath {
 	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;
 	private ArrayList<Float> bounds;
+	private HashMap<String,Float> distNtime;
+	
+	
+	public HashMap<String, Float> getDistNtime() {
+		return distNtime;
+	}
+	public void setDistNtime(HashMap<String, Float> distNtime) {
+		this.distNtime = distNtime;
+	}
 	
 	public ArrayList<Float> getBounds() {
 		return bounds;
