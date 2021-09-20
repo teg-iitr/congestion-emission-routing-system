@@ -32,7 +32,7 @@ public class TrafficAndRoutingService {
 	
 	private final GraphHopper gh;
 	//private static final String MAP_URL="maps/NewDelhi.osm.pbf";
-	private final String apiKey;
+	private String apiKey = System.getenv("here_api_key");
 	
 	private final AirQualityDataExtractor ai;
 	private final TrafficDataExtractor dt;
@@ -67,10 +67,11 @@ public class TrafficAndRoutingService {
 			args.setProfiles(profiles);
 			args.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
 			args.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
-			apiKey=prop.getProperty("here_api_key");
+			if( apiKey==null) apiKey =prop.getProperty("here_api_key"); // the api key must be in either system env or config.properties
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
+
     	gh.init(args).setGraphHopperLocation("graphLocation");
     	//System.out.println(gh.getEncodingManager().getDecimalEncodedValue("smoke"));
     	gh.clean();

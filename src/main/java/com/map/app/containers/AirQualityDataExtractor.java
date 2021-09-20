@@ -7,24 +7,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.graphhopper.util.shapes.BBox;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import com.graphhopper.GraphHopper;
-import com.graphhopper.config.Profile;
 import com.graphhopper.storage.Graph;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
 import com.map.app.model.AirQuality;
-import com.map.app.service.PathChoice;
-import com.map.app.service.TrafficAndRoutingService;
-import com.map.app.service.TransportMode;
 
 /**
  * @author Siftee, Amit
@@ -35,7 +29,7 @@ public class AirQualityDataExtractor {
 	private final Lock writeLock;
 	private final ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
-	private final String aqiApiKey;
+	private String aqiApiKey = System.getenv("waqi_api_key");;
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
 
 	public AirQualityDataExtractor(GraphHopper hopper, Lock lock) {
@@ -43,12 +37,14 @@ public class AirQualityDataExtractor {
 		this.jsonP = new JSONParser();
 		this.ap = new ArrayList<>();
 		this.writeLock = lock;
-		Properties prop=new Properties();
-		try(FileInputStream ip = new FileInputStream("config.properties");) {
-			prop.load(ip);
-			aqiApiKey=prop.getProperty("waqi_api_key");
-		} catch (IOException e) {
-			throw new RuntimeException("Config.properties not found. Aborting ...");
+		if (aqiApiKey ==null) {
+			Properties prop=new Properties();
+			try(FileInputStream ip = new FileInputStream("config.properties");) {
+				prop.load(ip);
+				aqiApiKey=prop.getProperty("waqi_api_key");
+			} catch (IOException e) {
+				throw new RuntimeException("Config.properties not found. Aborting ...");
+			}
 		}
 	}
 	public void readJSON(BBox boundingBox) {
@@ -78,8 +74,8 @@ public class AirQualityDataExtractor {
 			JSONObject obj = (JSONObject) jsonP.parse(response.toString());
 			JSONArray data = (JSONArray) obj.get("data");
 			//System.out.println(data);
-			for (int i = 0; i<data.size(); i++) {
-				JSONObject obj1 = (JSONObject) data.get(i);
+			for (Object datum : data) {
+				JSONObject obj1 = (JSONObject) datum;
 				double lat = (double) obj1.get("lat");
 				double lon = (double) obj1.get("lon");
 				String aq = (String) obj1.get("aqi");
