@@ -10,14 +10,14 @@ public class RoutePath {
 	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;
 	private ArrayList<Double> bounds;
-	private HashMap<String,Double> distNtime;
+	private HashMap<String,Float> distNtime;
 	
 	
-	public HashMap<String, Double> getDistNtime() {
+	public HashMap<String, Float> getDistNtime() {
 		return distNtime;
 	}
-	public void setDistNtime(HashMap<String, Double> distNtime) {
-		this.distNtime = distNtime;
+	public void setDistNtime(HashMap<String, Float> map) {
+		this.distNtime = map;
 	}
 	
 	public ArrayList<Double> getBounds() {

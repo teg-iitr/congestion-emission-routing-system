@@ -42,7 +42,7 @@ public class RoutePathContainer {
 		//making request
 		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);;
 		PointList pl = new PointList();
-		HashMap<String,Double> map=new HashMap<>();
+		HashMap<String,Float> map=new HashMap<>();
 		ArrayList<String> ins = new ArrayList<>();
 		try {
 			//getting result
@@ -51,10 +51,12 @@ public class RoutePathContainer {
 				throw new RuntimeException(fullRes.getErrors().toString());
 			}
 			ResponsePath res = fullRes.getBest();
-			map.put("Distance in meters", res.getDistance());
+
+			map.put("distance", (float)res.getDistance()); // m.
 			System.out.println("Distance in meters: " + res.getDistance());
-			map.put("Time in minutes", (res.getTime() / (60.*1000.)));
+			map.put("time", (float)(res.getTime() / (1000.))); // sec.
 			System.out.println("Time in minutes: " + res.getTime() / (60.*1000.));
+			
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {

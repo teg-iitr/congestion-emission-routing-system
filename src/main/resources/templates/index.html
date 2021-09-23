@@ -143,6 +143,9 @@
     	  console.log("hi!!");
     	  document.getElementById("inputbox2").style.display = "none";
       })
+      .on('select', function (e) {
+          putValue(document.getElementById('hid1'),e.latlng.lat, e.latlng.lng);
+      })
       .on('blur', function (e) {
           console.log("efe2");
           document.getElementById("inputbox2").style.display = "block";
