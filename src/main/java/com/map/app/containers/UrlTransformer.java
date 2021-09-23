@@ -41,7 +41,7 @@ public class UrlTransformer {
 		rp.setStartlat(Float.parseFloat(startCoords[1]));
 		rp.setStartlon(Float.parseFloat(startCoords[0]));
 		rp.setEndlat(Float.parseFloat(endCoords[1]));
-		rp.setEndlon(Float.parseFloat(startCoords[0]));
+		rp.setEndlon(Float.parseFloat(endCoords[0]));
 		rp.setRouteType(this.getRouteType());
 		rp.setVehicle(this.getVehicle());
 		return rp;

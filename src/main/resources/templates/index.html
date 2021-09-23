@@ -9,11 +9,18 @@
          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
          crossorigin=""/>
       <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="">  </script>
-      <!-- Loading relevant mapbox scripts and stylesheets for geocoding  -->
-      <link href="https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.css" rel="stylesheet">
-      <script src="https://api.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.js"></script>
-      <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
-      <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+      <!-- Loading relevant locationiq scripts and stylesheets for geocoding  -->
+      <link rel="stylesheet" href="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.6/leaflet-geocoder-locationiq.min.css?v=0.1.7">
+      <script src="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.6/leaflet-geocoder-locationiq.min.js?v=0.1.7"></script>
+      <!-- Changing the default styling of location iq geocode results -->
+      <style type="text/css">
+            .leaflet-locationiq-results
+            {
+            color: black;
+            height:300px;
+            }
+      </style>
+      
       <!-- Loading relevant jquery libraries and bootstrap libraries for toggle mode  -->
       <link rel = "stylesheet" href = "https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity = "sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin = "anonymous">
       <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -30,6 +37,7 @@
       <script th:src="@{static/js/traffic_disp/traffic_fetch.js}"></script>
       <!-- Loading script for converting string to title case-->
       <script th:src="@{static/js/text_style/title_case.js}"></script>
+
    </head>
    <body style="background-color:#ccd6fa">
       <div class="heading">
@@ -69,8 +77,8 @@
                         <div class="parent">
                            <input type="radio" th:field="*{Vehicle}" id="car" name="vehicles" value="car" required>
                            <label for="car">Car</label>
-                           <input type="radio" th:field="*{Vehicle}" id="bike" name="vehicles" value="bike" required>
-                           <label for="bike">Bike</label>
+                           <input type="radio" th:field="*{Vehicle}" id="motorcycle" name="vehicles" value="motorcycle" required>
+                           <label for="motorcycle">Motorcycle</label>
                            <input type="radio" th:field="*{Vehicle}" id="foot" name="vehicles" value="foot" required>
                            <label for="foot">Foot</label>
                         </div>
@@ -125,37 +133,48 @@
       /*
       Adding geocoding feature from mapbox
       */
-      accessToken = 'pk.eyJ1Ijoic2lmLXIiLCJhIjoiY2tsYWhtbWhuMDVscjJ2cDB1MzBmbzk3eCJ9.bkUIdAw-I609MJqxivzB9g';
-      var geocoder1 = new MapboxGeocoder({
-      	accessToken: accessToken,
-      	mapboxgl: mapboxgl,
-      	countries: 'in'
-      	});
-      var geocoder2 = new MapboxGeocoder({
-      	accessToken: accessToken,
-      	mapboxgl: mapboxgl,
-      	countries: 'in'
-      	});
-          document.getElementById('inputbox1').appendChild(geocoder1.onAdd());
-      	document.getElementById('inputbox2').appendChild(geocoder2.onAdd());
-      	
-      	geocoder1.on('result', e => {
-      	       document.getElementById('hid1').value=e.result.center;
-      	  console.log(document.getElementById('hid1').value);
-      	})
-      	geocoder2.on('result', e => {
-      	  var geocoder_result = e.result.bbox;
-      	      document.getElementById('hid2').value=e.result.center;
-      	  console.log(document.getElementById('hid2').value);
-      	})
-      geocoder1._inputEl.addEventListener('input', function (e) { document.getElementById('inputbox2').style.visibility = "hidden"; });
-      geocoder1._inputEl.addEventListener('blur', function (e) { document.getElementById('inputbox2').style.visibility = "visible"; });
+      //Geocoder options
+      var geocoderControlOptions = {
+          expanded: true,         //The geocoder search box will be initialized in expanded mode
+      }
+      //Initialize the geocoder
+      var geocoderControl1 = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map)
+      .on('focus', function (e) {
+    	  console.log("hi!!");
+    	  document.getElementById("inputbox2").style.display = "none";
+      })
+      .on('blur', function (e) {
+          console.log("efe2");
+          document.getElementById("inputbox2").style.display = "block";
+      });
+      var geocoderControl2 = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
+          putValue(document.getElementById('hid2'),e.latlng.lat, e.latlng.lng);
+      });
       
+      //Get the "search-box" div
+      var searchBoxControl1 = document.getElementById("inputbox1");
+      var searchBoxControl2 = document.getElementById("inputbox2");
+      
+      //Get the geocoder container from the leaflet map
+      var geocoderContainer1 = geocoderControl1.getContainer();
+      var geocoderContainer2 = geocoderControl2.getContainer();
+      //Append the geocoder container to the "searchboxes"
+      searchBoxControl1.appendChild(geocoderContainer1);
+      searchBoxControl2.appendChild(geocoderContainer2);
+      
+   </script>
+   <script>
+   //put value of geocoded lat longs
+   function putValue(container,lat,lng)
+   {
+	   container.value=lng+","+lat;
+	  
+   }
    </script>
    <script type="text/javascript" th:inline="javascript">
       //validate source and destination box with regards to having appropriate values
       function validateForm() {
-      	if(document.getElementById('hid1').value=="")
+    	if(document.getElementById('hid1').value=="")
       	{
       	alert("Please fill starting location correctly");
       	 return false;

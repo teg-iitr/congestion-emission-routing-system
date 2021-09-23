@@ -9,21 +9,21 @@ import com.graphhopper.util.shapes.GHPoint;
 public class RoutePath {
 	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;
-	private ArrayList<Float> bounds;
-	private HashMap<String,Float> distNtime;
+	private ArrayList<Double> bounds;
+	private HashMap<String,Double> distNtime;
 	
 	
-	public HashMap<String, Float> getDistNtime() {
+	public HashMap<String, Double> getDistNtime() {
 		return distNtime;
 	}
-	public void setDistNtime(HashMap<String, Float> distNtime) {
+	public void setDistNtime(HashMap<String, Double> distNtime) {
 		this.distNtime = distNtime;
 	}
 	
-	public ArrayList<Float> getBounds() {
+	public ArrayList<Double> getBounds() {
 		return bounds;
 	}
-	public void setBounds(ArrayList<Float> bounds) {
+	public void setBounds(ArrayList<Double> bounds) {
 		this.bounds = bounds;
 	}
 	
@@ -59,10 +59,10 @@ public class RoutePath {
 			points.add(new GHPoint(rp.getLat(i),rp.getLon(i)));
 		}
 		BBox routeBB=calcBBox2D(rp);
-		bounds.add((float) routeBB.minLat);
-		bounds.add((float) routeBB.minLon);
-		bounds.add((float) routeBB.maxLat);
-		bounds.add((float) routeBB.maxLon);
+		bounds.add(routeBB.minLat);
+		bounds.add(routeBB.minLon);
+		bounds.add(routeBB.maxLat);
+		bounds.add(routeBB.maxLon);
 		navigationInstruction = ins;
 	}
 }

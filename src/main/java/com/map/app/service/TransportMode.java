@@ -5,6 +5,6 @@ package com.map.app.service;
  */
 public enum TransportMode {
 
-    car, bike, foot;
+    car, motorcycle, foot;
 
 }

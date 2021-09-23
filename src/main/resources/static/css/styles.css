@@ -64,7 +64,6 @@ body,html {
 text-align: center;
 padding: 2.5%;		
 }
-
 .optiongrp
 {
 	display: flex;  flex-grow: 1; flex-direction: column; justify-content: center;  align-items: center; 
