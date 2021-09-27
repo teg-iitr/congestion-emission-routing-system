@@ -9,15 +9,17 @@ import com.graphhopper.util.shapes.GHPoint;
 public class RoutePath {
 	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;
+
 	private ArrayList<Double> bounds;
-	private HashMap<String,Float> distNtime;
+	private HashMap<String,Float> summary;
 	
 	
-	public HashMap<String, Float> getDistNtime() {
-		return distNtime;
+	public HashMap<String, Float> getSummary() {
+		return summary;
 	}
-	public void setDistNtime(HashMap<String, Float> map) {
-		this.distNtime = map;
+
+	public void setSummary(HashMap<String, Float> summary) {
+		this.summary = summary;
 	}
 	
 	public ArrayList<Double> getBounds() {
