@@ -70,7 +70,7 @@ public class RoutePathContainer {
 			pl = res.getPoints();
 		} finally {
 			result.fillPath(pl, ins);
-			result.setDistNtime(map);
+			result.setSummary(map);
 			readLock.unlock();
 		}
 		return result; //result contains latitudes and longitudes of route and instructions for navigation
