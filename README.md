@@ -7,4 +7,7 @@ In order to use the above project,
 * Open http://localhost:9098/ where the website will be displayed
 * After doing the routing, to get json response of the routing, add "&mediaType=json" as another parameter. For example: http://localhost:9098/routing?StartLoc=77.09652%2C28.555764&EndLoc=77.32%2C28.57&RouteType=fastest&Vehicle=bike&mediaType=json
 * In order to run the project without any additional commandline arguments, simply type  mvn spring-boot:run  
-Used the following geocoding library: https://github.com/location-iq/leaflet-geocoder
+Used the following geocoding library: https://github.com/location-iq/leaflet-geocoder<br>
+Please note that specifying points outside the bounds of the datareader file currently raises PointOutOfBoundsException error:<br>
+[com.graphhopper.util.exceptions.PointOutOfBoundsException: Point 0 is out of bounds: your_latitude,your_longitude the bounds are: bbox of datareader file] <br>
+We are currently working on giving a relevant message to the client instead.
