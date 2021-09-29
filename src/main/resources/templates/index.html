@@ -126,7 +126,7 @@
       		   {
       		   document.getElementById('instructionBox').style.height=250+'px'
       		   }
-      		console.log(document.getElementById('mapid').offsetHeight)
+      		//console.log(document.getElementById('mapid').offsetHeight)
       	});
    </script>
    <script type="text/javascript" th:inline="javascript">
@@ -184,9 +184,25 @@
       	}
       	if(document.getElementById('hid2').value=="")
       	{
+      		
       		alert("Please fill destination location correctly");
       	 return false;
       	}
+      	bb=document.getElementById('hid1').value.split(",")
+      	console.log(bbox[0]+","+bb[1])
+      	console.log(bbox[2]<bb[1])
+      	if(bbox[0]>bb[1] || bbox[1]>bb[0] || bbox[2]<bb[1] || bbox[3]<bb[0])
+      	{
+      		alert("Source ("+bb[1]+","+bb[0]+") is out of bounds for the bounding box = ["+bbox[0]+","+bbox[1]+" "+bbox[2]+","+bbox[3]+"]")
+      	return false;
+      	}
+      	bb=document.getElementById('hid2').value.split(",")
+      	if(bbox[0]>bb[1] || bbox[1]>bb[0] || bbox[2]<bb[1] || bbox[3]<bb[0])
+      	{
+      		alert("Source ("+bb[1]+","+bb[0]+") is out of bounds for the bounding box = ["+bbox[0]+","+bbox[1]+" "+bbox[2]+","+bbox[3]+"]")
+      	return false;
+      	}
+      	
       	}
       /*
       Display of routing results
