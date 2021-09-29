@@ -3,10 +3,6 @@ This is a real-time traffic and air pollution monitoring and routing web applica
 The routing is done using the existing graphhopper libraries. Traffic data and air pollution data is fetched every 10 minutes from Here Maps Api and Aqicn Api and real-time routing is done.<br>
 # Notes
 * Used the following geocoding library: https://github.com/location-iq/leaflet-geocoder<br>
-* Please note that specifying points outside the bounds of the datareader file currently raises PointOutOfBoundsException error:
-[com.graphhopper.util.exceptions.PointOutOfBoundsException: Point 0 is out of bounds: your_latitude,your_longitude the bounds are: bbox of datareader file]
-We are currently working on giving a relevant message to the client instead.
-
 # Steps
 In order to use the above project,
 * Clone the repository using the following command on your console/command prompt in the location of your choice: <br>git clone https://github.com/teg-iitr/gh_configured_router.git 
