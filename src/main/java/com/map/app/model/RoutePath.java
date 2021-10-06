@@ -49,7 +49,7 @@ public class RoutePath {
 	
 	public BBox calcBBox2D(PointList pointList) {
 		  BBox bounds = BBox.createInverse(false);
-		  for (int i = 0; i < pointList.getSize(); i++) {
+		  for (int i = 0; i < pointList.size(); i++) {
 		    bounds.update(pointList.getLat(i), pointList.getLon(i));
 		  }
 		 
