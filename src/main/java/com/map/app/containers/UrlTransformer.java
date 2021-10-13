@@ -2,6 +2,9 @@ package com.map.app.containers;
 
 import com.map.app.model.UrlContainer;
 
+/**
+ * @author Siftee
+ */
 public class UrlTransformer {
 	private String StartLoc;
 	private String EndLoc;

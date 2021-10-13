@@ -22,6 +22,8 @@ import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.PMap;
 import com.graphhopper.util.Parameters;
+
+
 //custom weighting factory with "greenest" and "balanced" option
 public class MyWeightingFactory implements WeightingFactory{
 	private final GraphHopperStorage ghStorage;

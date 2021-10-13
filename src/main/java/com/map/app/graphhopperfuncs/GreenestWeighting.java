@@ -10,6 +10,9 @@ import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PR
 import org.locationtech.jts.planargraph.Edge;
 
 
+/**
+ * @author Siftee
+ */
 public class GreenestWeighting extends AbstractWeighting {
 	private static final String NAME="greenest";
 	private DecimalEncodedValue smokeEnc;

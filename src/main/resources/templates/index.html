@@ -71,6 +71,9 @@
                         <input type="radio" th:field="*{RouteType}" id="fastest" name="routes" value="fastest" required>
                         <label style="background-color:indianred;"  for="fastest">Fastest Route</label>
                         <br>
+                        <input type="radio" th:field="*{RouteType}" id="shortest" name="routes" value="shortest" required>
+                        <label for="shortest" style="background-color:orange;">Shortest Route</label>
+                        <br>
                         <input type="radio" th:field="*{RouteType}" id="balanced" name="routes" value="balanced" required>
                         <label for="balanced" style="background-color:royalblue;">Balanced Route</label>
                         <!-- Vehicles types search -->
@@ -79,6 +82,8 @@
                            <label for="car">Car</label>
                            <input type="radio" th:field="*{Vehicle}" id="motorcycle" name="vehicles" value="motorcycle" required>
                            <label for="motorcycle">Motorcycle</label>
+                           <input type="radio" th:field="*{Vehicle}" id="bike" name="vehicles" value="bike" required>
+                           <label for="bike">Bicycle</label>
                            <input type="radio" th:field="*{Vehicle}" id="foot" name="vehicles" value="foot" required>
                            <label for="foot">Foot</label>
                         </div>

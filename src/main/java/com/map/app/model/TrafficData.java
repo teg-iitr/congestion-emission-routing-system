@@ -1,6 +1,9 @@
 package com.map.app.model;
 import java.util.List;
 
+/**
+ * @author Siftee
+ */
 public class TrafficData {
 
 	private List<List<Float>> lat;

@@ -1,5 +1,8 @@
 package com.map.app.model;
 
+/**
+ * @author Siftee
+ */
 public class UrlContainer {
 	private double Startlat;
 	private double Startlon;

@@ -14,7 +14,9 @@ import com.map.app.model.RoutePath;
 import com.map.app.model.TrafficData;
 import com.map.app.service.TrafficAndRoutingService;
 
-
+/**
+ * @author Siftee
+ */
 @Controller
 public class MapControl {
 	@Autowired
@@ -48,8 +50,7 @@ public class MapControl {
 	 {
 		
 		 UrlContainer rp=pt.convert();
-		 RoutePath res=trs.getPath(rp);
-		 return res;
+		 return trs.getPath(rp);
 	 }
 	
     @RequestMapping(value = "/traffic", method = RequestMethod.GET, produces = "application/json")

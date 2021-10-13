@@ -5,5 +5,10 @@ package com.map.app.service;
  */
 
 public enum PathChoice {
-    fastest, greenest, balanced;
+    fastest, /*by travel time*/
+    greenest, /*by air pollution exposure*/
+    balanced, /*by travel time and air pollution exposure*/
+    shortest /*by distance*/
+    ;
+    // see profiles: https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/profiles.md
 }

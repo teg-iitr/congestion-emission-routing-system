@@ -6,6 +6,10 @@ import java.util.HashMap;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.BBox;
 import com.graphhopper.util.shapes.GHPoint;
+
+/**
+ * @author Siftee
+ */
 public class RoutePath {
 	private ArrayList<GHPoint> points;
 	private ArrayList<String> navigationInstruction;

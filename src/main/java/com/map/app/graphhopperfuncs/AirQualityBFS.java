@@ -16,7 +16,7 @@ import com.map.app.model.AirQuality;
 import com.map.app.service.TransportMode;
 
 /**
- * @author Siftee, Author
+ * @author Siftee
  */
 public class AirQualityBFS extends XFirstSearch {
 	//does a BFS traversal and assigns edge with air quality value as average of aqi value of base and adjacent node.
@@ -62,9 +62,9 @@ public class AirQualityBFS extends XFirstSearch {
 					double base_lat = gh.getNodeAccess().getLat(current);
 					double base_lon = gh.getNodeAccess().getLon(current);
 					double airQualityBase = IDW(base_lat, base_lon);
-					double adj_lat = gh.getNodeAccess().getLat(connectedId);
-					double adj_lon = gh.getNodeAccess().getLon(connectedId);
-					double airQualityAdj = IDW(adj_lat, adj_lon);
+					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
+					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
+					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
 					EdgeIteratorState edge = gh.getEdgeIteratorState(iter.getEdge(), Integer.MIN_VALUE);
 
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
