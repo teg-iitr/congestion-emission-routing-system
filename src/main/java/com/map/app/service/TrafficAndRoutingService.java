@@ -7,6 +7,9 @@ import java.util.Properties;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.graphhopper.json.Statement;
+import com.graphhopper.routing.weighting.custom.CustomProfile;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.shapes.BBox;
 import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
@@ -63,7 +66,16 @@ public class TrafficAndRoutingService {
 					profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
 				}
 			}
-			
+
+			profiles.add(new Profile("IPT").setVehicle("car").setWeighting("fastest"));
+
+			CustomModel bus_custom_model = new CustomModel();
+			bus_custom_model.addToSpeed(Statement.If( "road_class != PRIMARY", Statement.Op.LIMIT, 0.1));
+			bus_custom_model.addToSpeed(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
+			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car"));
+
+			profiles.add(new CustomProfile("metro").setCustomModel(bus_custom_model).setVehicle("car"));
+
 			args.setProfiles(profiles);
 			args.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
 			args.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));

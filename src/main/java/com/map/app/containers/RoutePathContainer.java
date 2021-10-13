@@ -34,9 +34,23 @@ public class RoutePathContainer {
 		this.readLock.lock();
 
 		//fetching the profile to do routing with
-		TransportMode mode = TransportMode.valueOf(p.getVehicle());
-		PathChoice pathChoice = PathChoice.valueOf(p.getRouteType());
-		String profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice,mode);
+		String profile;
+		switch (p.getVehicle()) {
+			case "bus":
+				profile = "bus";
+				break;
+			case "IPT":
+				profile = "IPT";
+				break;
+			case "metro":
+				profile = "metro";
+				break;
+			default:
+				TransportMode mode = TransportMode.valueOf(p.getVehicle());
+				PathChoice pathChoice = PathChoice.valueOf(p.getRouteType());
+				profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice, mode);
+				break;
+		}
 
 		RoutePath result = new RoutePath();
 		//making request
