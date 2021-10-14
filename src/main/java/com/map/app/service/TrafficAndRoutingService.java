@@ -46,7 +46,9 @@ public class TrafficAndRoutingService {
     
     {
     	lock=new ReentrantReadWriteLock();
-    	GraphHopperConfig args=new GraphHopperConfig();
+    	GraphHopperConfig config=new GraphHopperConfig();
+    	config.putObject("index.max_region_search", 6); // increasing the search radius (a point in Rajaji forest is not able to find any road)
+
     	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",16,0.1,0,true); //maxValue->155.5
     	
     	gh=new MyGraphHopper();
@@ -58,7 +60,7 @@ public class TrafficAndRoutingService {
 		try(FileInputStream ip = new FileInputStream("config.properties");) {
 			prop.load(ip);
 			System.out.println("Using OSM file "+ prop.getProperty("datareader.file"));
-			args.putObject("datareader.file",prop.getProperty("datareader.file"));
+			config.putObject("datareader.file",prop.getProperty("datareader.file"));
 			List<Profile> profiles = new ArrayList<>();
 
 			for (PathChoice pc : PathChoice.values()) {
@@ -78,15 +80,15 @@ public class TrafficAndRoutingService {
 			metro_custom_model.addToSpeed(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
 			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car"));
 
-			args.setProfiles(profiles);
-			args.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
-			args.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
+			config.setProfiles(profiles);
+			config.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
+			config.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
 			if( apiKey==null) apiKey =prop.getProperty("here_api_key"); // the api key must be in either system env or config.properties
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
 
-    	gh.init(args).setGraphHopperLocation("graphLocation");
+    	gh.init(config).setGraphHopperLocation("graphLocation");
     	//System.out.println(gh.getEncodingManager().getDecimalEncodedValue("smoke"));
     	gh.clean();
     	gh.importOrLoad();
