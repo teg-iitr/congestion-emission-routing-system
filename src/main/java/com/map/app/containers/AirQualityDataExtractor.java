@@ -29,7 +29,7 @@ public class AirQualityDataExtractor {
 	private final Lock writeLock;
 	private final ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
-	private String aqiApiKey = System.getenv("waqi_api_key");;
+	private String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
 
 	public AirQualityDataExtractor(GraphHopper hopper, Lock lock) {
@@ -64,7 +64,7 @@ public class AirQualityDataExtractor {
 			}
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
-			StringBuffer response = new StringBuffer();
+			StringBuilder response = new StringBuilder();
 			while ((inputLine = in .readLine()) != null) {
 				response.append(inputLine);
 			}

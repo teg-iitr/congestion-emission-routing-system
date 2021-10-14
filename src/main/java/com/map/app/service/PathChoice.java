@@ -9,6 +9,5 @@ public enum PathChoice {
     greenest, /*by air pollution exposure*/
     balanced, /*by travel time and air pollution exposure*/
     shortest /*by distance*/
-    ;
     // see profiles: https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/profiles.md
 }

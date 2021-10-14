@@ -7,16 +7,14 @@ import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.util.EdgeIteratorState;
 import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PROVIDER;
 
-import org.locationtech.jts.planargraph.Edge;
-
 
 /**
  * @author Siftee
  */
 public class GreenestWeighting extends AbstractWeighting {
 	private static final String NAME="greenest";
-	private DecimalEncodedValue smokeEnc;
-	DecimalEncodedValue avgSpeedEnc;
+	private final DecimalEncodedValue smokeEnc;
+	final DecimalEncodedValue avgSpeedEnc;
     
 	protected GreenestWeighting(FlagEncoder encoder) {
 		this(encoder,NO_TURN_COST_PROVIDER);
@@ -36,7 +34,6 @@ public class GreenestWeighting extends AbstractWeighting {
 	}
 	@Override
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
-		double smokeValue=edgeState.get(smokeEnc);
-		return smokeValue;
+		return edgeState.get(smokeEnc);
 	}
 }

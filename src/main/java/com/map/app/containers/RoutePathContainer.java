@@ -54,7 +54,7 @@ public class RoutePathContainer {
 
 		RoutePath result = new RoutePath();
 		//making request
-		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);;
+		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();
 		ArrayList<String> ins = new ArrayList<>();

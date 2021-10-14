@@ -43,7 +43,7 @@ public class TrafficDataExtractor {
 
 	public void fetchData(String apiKey, BBox boundingBox) {
 		final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey="
-				+apiKey +"&bbox=" +
+				+apiKey +"&bbox="
 				+boundingBox.minLat+","+boundingBox.minLon + ";"
 				+ boundingBox.maxLat + "," + boundingBox.maxLon +
 				"&responseattributes=sh,fc&units=metric";
@@ -163,7 +163,7 @@ public class TrafficDataExtractor {
 										longs.add(Float.parseFloat(ans[1]));
 									}
 
-									for (int l = 1; l<(int) ans.length / 2; l++) {
+									for (int l = 1; l< ans.length / 2; l++) {
 										las.add(Float.parseFloat(ans[2 * l]));
 										longs.add(Float.parseFloat(ans[2 * l + 1]));
 									}

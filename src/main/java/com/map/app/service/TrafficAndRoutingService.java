@@ -30,11 +30,7 @@ import com.map.app.model.TrafficData;
 
 @Service
 public class TrafficAndRoutingService {
-	
-	private final ReadWriteLock lock;
-	
-	private final GraphHopper gh;
-	//private static final String MAP_URL="maps/NewDelhi.osm.pbf";
+
 	private String apiKey = System.getenv("here_api_key");
 	
 	private final AirQualityDataExtractor ai;
@@ -45,19 +41,19 @@ public class TrafficAndRoutingService {
 	public TrafficAndRoutingService()
     
     {
-    	lock=new ReentrantReadWriteLock();
+		ReadWriteLock lock=new ReentrantReadWriteLock();
     	GraphHopperConfig config=new GraphHopperConfig();
     	config.putObject("index.max_region_search", 6); // increasing the search radius (a point in Rajaji forest is not able to find any road)
 
     	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",16,0.1,0,true); //maxValue->155.5
-    	
-    	gh=new MyGraphHopper();
+
+		GraphHopper gh=new MyGraphHopper();
     	//gh.getEncodingManager().
     	//gh.createWeighting(null, null, false)
     	gh.getEncodingManagerBuilder().add(smokeEnc);
     	//gh.c
     	Properties prop=new Properties();
-		try(FileInputStream ip = new FileInputStream("config.properties");) {
+		try(FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			System.out.println("Using OSM file "+ prop.getProperty("datareader.file"));
 			config.putObject("datareader.file",prop.getProperty("datareader.file"));
