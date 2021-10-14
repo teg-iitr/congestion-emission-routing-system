@@ -67,8 +67,9 @@ public class TrafficAndRoutingService {
 				}
 			}
 
-			profiles.add(new Profile("IPT").setVehicle("car").setWeighting("fastest"));
+			profiles.add(new Profile("ipt").setVehicle("car").setWeighting("fastest"));
 
+			// see https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/custom-models.md
 			CustomModel bus_custom_model = new CustomModel();
 			bus_custom_model.addToSpeed(Statement.If( "road_class != PRIMARY", Statement.Op.LIMIT, 0.1));
 			bus_custom_model.addToSpeed(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));

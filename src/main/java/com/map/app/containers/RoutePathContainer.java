@@ -39,8 +39,8 @@ public class RoutePathContainer {
 			case "bus":
 				profile = "bus";
 				break;
-			case "IPT":
-				profile = "IPT";
+			case "ipt":
+				profile = "ipt";
 				break;
 			case "metro":
 				profile = "metro";
