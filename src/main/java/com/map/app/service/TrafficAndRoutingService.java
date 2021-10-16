@@ -38,12 +38,10 @@ public class TrafficAndRoutingService {
 	private final RoutePathContainer rp;
 	private final BBox boundingBox;
 
-	public TrafficAndRoutingService()
-    
-    {
+	public TrafficAndRoutingService() {
 		ReadWriteLock lock=new ReentrantReadWriteLock();
     	GraphHopperConfig config=new GraphHopperConfig();
-    	config.putObject("index.max_region_search", 6); // increasing the search radius (a point in Rajaji forest is not able to find any road)
+    	config.putObject("index.max_region_search", 8); // increasing the search radius (a point in Rajaji forest is not able to find any road)
 
     	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",16,0.1,0,true); //maxValue->155.5
 
@@ -69,11 +67,11 @@ public class TrafficAndRoutingService {
 
 			// see https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/custom-models.md
 			CustomModel bus_custom_model = new CustomModel();
-			bus_custom_model.addToSpeed(Statement.If( "road_class == RESIDENTIAL", Statement.Op.LIMIT, 0.1));
+			bus_custom_model.addToPriority(Statement.If( "road_class == RESIDENTIAL", Statement.Op.LIMIT, 0.1));
 			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car"));
 
 			CustomModel metro_custom_model = new CustomModel();
-			metro_custom_model.addToSpeed(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
+			metro_custom_model.addToPriority(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
 			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car"));
 
 			config.setProfiles(profiles);
