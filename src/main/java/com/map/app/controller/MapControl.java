@@ -37,7 +37,7 @@ public class MapControl {
     {
 		
     UrlContainer rp=pt.convert();
-    System.out.println(rp.toString());
+//    System.out.println(rp.toString());
 	RoutePath res=trs.getPath(rp);
 	model.addAttribute("route",res);
 	model.addAttribute("bbox",res.getBounds());
