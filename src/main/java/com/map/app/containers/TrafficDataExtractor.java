@@ -1,6 +1,5 @@
 package com.map.app.containers;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -91,7 +90,7 @@ public class TrafficDataExtractor {
 				EdgeIteratorState edge = graph.getEdgeIteratorState(edgeId, Integer.MIN_VALUE);
 				double value;
 				switch(TrafficAndRoutingService.speedChoice){
-					case avg_from_hereMaps:
+					case avg_actual_from_hereMaps:
 					default:
 						value = entrySpeed.get(0);
 						break;
