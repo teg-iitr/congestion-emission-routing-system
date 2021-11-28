@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import com.graphhopper.util.shapes.BBox;
+import com.map.app.service.TrafficAndRoutingService;
 import com.map.app.service.TransportMode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,8 +66,8 @@ public class TrafficDataExtractor {
 		for (TransportMode mode: TransportMode.values()) {
 			FlagEncoder encoder = hopper.getEncodingManager().getEncoder(mode.toString());
 			LocationIndex locationIndex = hopper.getLocationIndex();
-			int errors = 0;
-			int updates = 0;
+//			int errors = 0;
+//			int updates = 0;
 			Set<Integer> edgeIds = new HashSet<> ();
 			for (int i = 0; i<dt.getLat().size(); i++) {
 				List<Float> entryLats = dt.getLat().get(i);
@@ -77,22 +78,34 @@ public class TrafficDataExtractor {
 				Snap qr = locationIndex.findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
 				if (!qr.isValid()) {
 					// logger.info("no matching road found for entry " + entry.getId() + " at " + point);
-					errors++;
+//					errors++;
 					continue;
 				}
 				int edgeId = qr.getClosestEdge().getEdge();
 				if (edgeIds.contains(edgeId)) {
 					// TODO this wouldn't happen with our map matching component
-					errors++;
+//					errors++;
 					continue;
 				}
 				edgeIds.add(edgeId);
 				EdgeIteratorState edge = graph.getEdgeIteratorState(edgeId, Integer.MIN_VALUE);
-				double value = entrySpeed.get(0);
+				double value;
+				switch(TrafficAndRoutingService.speedChoice){
+					case avg_from_hereMaps:
+					default:
+						value = entrySpeed.get(0);
+						break;
+					case free_flow_from_hereMaps:
+						value = entrySpeed.get(1);
+						break;
+					case lower_of_two:
+						value = Math.min(entrySpeed.get(0), entrySpeed.get(1));
+						break;
+				}
 				DecimalEncodedValue avgSpeedEnc = encoder.getAverageSpeedEnc();
 				double oldValue = edge.get(avgSpeedEnc);
 				if (value != oldValue) {
-					updates++;
+//					updates++;
 					
 					edge.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
 				}
@@ -116,7 +129,7 @@ public class TrafficDataExtractor {
 				Node road_1 = roads.item(i);
 				if (road_1.getNodeType() == Node.ELEMENT_NODE) {
 					Element road = (Element) road_1;
-					float le = 0;
+//					float le = 0;
 					float fc = 5;
 					float su = 0;
 					float cn = 0;
@@ -126,9 +139,9 @@ public class TrafficDataExtractor {
 						Node child_1 = myxml.item(j);
 						if (child_1.getNodeType() == Node.ELEMENT_NODE) {
 							Element child = (Element) child_1;
-							if (child.hasAttribute("LE")) {
-								le = Float.parseFloat(child.getAttribute("LE"));
-							}
+//							if (child.hasAttribute("LE")) {
+//								le = Float.parseFloat(child.getAttribute("LE"));
+//							}
 							if (child.hasAttribute("FC")) {
 								fc = Float.parseFloat(child.getAttribute("FC"));
 							}
@@ -144,13 +157,12 @@ public class TrafficDataExtractor {
 
 						}
 					}
-					if (cn >= 0.7 && fc<= 4) {
+					if (cn >= 0.7 && fc<= TrafficAndRoutingService.functional_road_class_here_maps) {
 
 						NodeList shps = road.getElementsByTagName("SHP");
 						if (shps.getLength() > 0) {
 							ArrayList<Float> las = new ArrayList<>();
 							ArrayList<Float> longs = new ArrayList<>();
-							ArrayList<Float> combospeed = new ArrayList<>();
 
 							for (int k = 0; k<shps.getLength(); k++) {
 								Node shp_1 = shps.item(k);
@@ -171,6 +183,7 @@ public class TrafficDataExtractor {
 							}
 							tempdt.getLat().add(las);
 							tempdt.getLons().add(longs);
+							ArrayList<Float> combospeed = new ArrayList<>(2);
 							combospeed.add(su);
 							combospeed.add(ff);
 							tempdt.getSpeed().add(combospeed);
@@ -182,21 +195,10 @@ public class TrafficDataExtractor {
 
 			}
 			feed(tempdt);
-		} catch (ParserConfigurationException e) {
+		} catch (ParserConfigurationException | SAXException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally 
-		{
+		} finally {
 			System.out.println("Traffic parsing done...");
 		}
 
