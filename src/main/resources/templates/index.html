@@ -76,6 +76,10 @@
                         <br>
                         <input type="radio" th:field="*{RouteType}" id="balanced" name="routes" value="balanced" required>
                         <label for="balanced" style="background-color:royalblue;">Balanced Route</label>
+                        <br>
+                        <input type="radio" th:field="*{RouteType}" id="all" name="routes" value="all" required>
+                        <label for="all" style="background-color:#fbec5d;">All Routes</label>
+                        <br>
                         <!-- Vehicles types search -->
                         <div class="parent">
                            <input type="radio" th:field="*{Vehicle}" id="car" name="vehicles" value="car" required>
@@ -216,35 +220,58 @@
 
           
       	 var data=/*[[${route}]]*/"";
+      	 
       	 if(data!=null)
       		 {
       		 console.log(data);
       
       		 document.getElementById('hid1').value="";
       		 document.getElementById('hid2').value="";
-      		 let colour='blue';
+      		 const nav_color=["LightCoral","LightGreen","PowderBlue","LightSalmon"];
+      		 const route_color=["red","green","blue","orange"];
+     		 
+      		 let colour=route_color[2];
       		 if (document.getElementById('greenest').checked) {
-      				colour='green';
+      				colour=route_color[1];
       				}
       		 if (document.getElementById('fastest').checked) {
-      				colour='red';
+      				colour=route_color[0];
       				}
-      
-      			 for(let i=0;i<data.points.length;i++)
+
+      		 if (document.getElementById('shortest').checked) {
+      				colour=route_color[3];
+      				}
+      		
+      		 var instructionBox=document.createElement('div');
+  			instructionBox.id='instructionBox';
+  			document.getElementById('inputbox').appendChild(instructionBox);
+  			instructionBox.style="background-color:rgb(210 229 219);color:forestgreen;font-size:20px;overflow:auto";
+  			document.getElementById('instructionBox').style.height=250+'px';
+  			instructionBox.innerHTML+="Turn-By-Turn Navigation"
+  			console.log(instructionBox.style.height);
+  			
+      		 for(let j=0;j<data.length;j++)
+      			 {
+      			 if(document.getElementById('all').checked)
+      				 {
+      				 colour=route_color[j];
+      				 }
+      			 for(let i=0;i<data[j].points.length;i++)
       			{
+      				 
       				if(i==0)
       				{
-      					var start = L.marker([data.points[i].lat,data.points[i].lon]).addTo(map);
+      					var start = L.marker([data[j].points[i].lat,data[j].points[i].lon]).addTo(map);
       					start.bindPopup("<b> Source </b>")
       				}
-      				if(i==data.points.length-1)
+      				if(i==data[j].points.length-1)
       				{
-      					var end = L.marker([data.points[i].lat,data.points[i].lon]).addTo(map);
+      					var end = L.marker([data[j].points[i].lat,data[j].points[i].lon]).addTo(map);
       					end.bindPopup("<b> Destination </b>")
       					break;
       				}
-      				var pointA=new L.LatLng(data.points[i].lat,data.points[i].lon);
-      				var pointB=new L.LatLng(data.points[i+1].lat,data.points[i+1].lon);
+      				var pointA=new L.LatLng(data[j].points[i].lat,data[j].points[i].lon);
+      				var pointB=new L.LatLng(data[j].points[i+1].lat,data[j].points[i+1].lon);
       				var pointList=[pointA,pointB];
       				var edge=new L.Polyline(pointList);
       				edge.setStyle({
@@ -253,23 +280,20 @@
       		        edge.addTo(map);
       			}
       			//creating and adding instruction box to inputbox for turn by turn instructions
-      			var instructionBox=document.createElement('div');
-      			instructionBox.id='instructionBox';
-      			document.getElementById('inputbox').appendChild(instructionBox);
-      			instructionBox.style="background-color:rgb(210 229 219);color:forestgreen;font-size:20px;overflow:auto";
-      			document.getElementById('instructionBox').style.height=250+'px';
-      			instructionBox.innerHTML+="Turn-By-Turn Navigation"
-      			console.log(instructionBox.style.height);
-      			for(let i=0;i<data.navigationInstruction.length;i++)
+      			for(let i=0;i<data[j].navigationInstruction.length;i++)
       			{
       				let instruction=document.createElement('div');
       				instruction.id=i;
       				instruction.style="border:1px dotted black; color:black;font-size:10px"
-      				instruction.innerHTML+="<b>"+(i+1)+" "+toTitleCase(data.navigationInstruction[i])+"</b>";
+      				if(data.length>1)
+      					{
+      					instruction.style.backgroundColor=nav_color[j];
+      					}
+      				instruction.innerHTML+="<b>"+(i+1)+" "+toTitleCase(data[j].navigationInstruction[i])+"</b>";
       				document.getElementById('instructionBox').appendChild(instruction);
       			}
       			
-      		
+      			 }
       		 }
       	}
       	

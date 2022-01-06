@@ -28,13 +28,57 @@ public class RoutePathContainer {
 		this.gh = hopper;
 		this.readLock = readLock;
 	}
+	
+	public RoutePath finalPath(UrlContainer p,String profile)
+	{
+		RoutePath indiv=new RoutePath();
+		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
+		PointList pl = new PointList();
+		HashMap<String,Float> map=new HashMap<>();
+		ArrayList<String> ins = new ArrayList<>();
+		try 
+		{//getting result
+			GHResponse fullRes = gh.route(request);
+			if (fullRes.hasErrors()) 
+			{
+				throw new RuntimeException(fullRes.getErrors().toString());
+				}
+			ResponsePath res = fullRes.getBest();
+			map.put("distance", (float)res.getDistance()); // m.
+			//			System.out.println("Distance in meters: " + res.getDistance());
+			map.put("time", (float)(res.getTime() / (1000.))); // sec.
+			//			System.out.println("Time in minutes: " + res.getTime() / (60.*1000.));
+			InstructionList list = res.getInstructions();
+			for (Instruction ele: list) {
+				if (ele.getSign() != 4) {
+					String navIns = ele.getTurnDescription(list.getTr()) + ",covering about " + ele.getDistance() + " meters";
+					ins.add(navIns.toLowerCase());
+					} 
+				else {
+					String navIns = ele.getTurnDescription(list.getTr());
+					ins.add(navIns);
+					}
+				}
+			pl = res.getPoints();
+			} 
+		finally {
+			indiv.fillPath(pl, ins);
+			indiv.setSummary(map);
+			}
+		return indiv;
+	}
 
-	public RoutePath find(UrlContainer p) {
+	public ArrayList<RoutePath> find(UrlContainer p) {
 		//routing result for given route information
 		this.readLock.lock();
-
+		ArrayList<RoutePath> result = new ArrayList<>();
+		
+		try
+		{
 		//fetching the profile to do routing with
-		String profile;
+		String profile="";
+		TransportMode mode=TransportMode.valueOf("car");
+		PathChoice pathChoice;
 		switch (p.getVehicle()) {
 			case "bus":
 				profile = "bus";
@@ -46,49 +90,35 @@ public class RoutePathContainer {
 				profile = "metro";
 				break;
 			default:
-				TransportMode mode = TransportMode.valueOf(p.getVehicle());
-				PathChoice pathChoice = PathChoice.valueOf(p.getRouteType());
-				profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice, mode);
+				 mode= TransportMode.valueOf(p.getVehicle());
+				 pathChoice= PathChoice.valueOf(p.getRouteType());
+				 if(pathChoice.toString().equals("all")==false)
+					profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice, mode);
 				break;
 		}
 
-		RoutePath result = new RoutePath();
-		//making request
-		GHRequest request = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
-		PointList pl = new PointList();
-		HashMap<String,Float> map=new HashMap<>();
-		ArrayList<String> ins = new ArrayList<>();
-		try {
-			//getting result
-			GHResponse fullRes = gh.route(request);
-			if (fullRes.hasErrors()) {
-				throw new RuntimeException(fullRes.getErrors().toString());
-			}
-			ResponsePath res = fullRes.getBest();
-
-			map.put("distance", (float)res.getDistance()); // m.
-//			System.out.println("Distance in meters: " + res.getDistance());
-			map.put("time", (float)(res.getTime() / (1000.))); // sec.
-//			System.out.println("Time in minutes: " + res.getTime() / (60.*1000.));
-			
-			InstructionList list = res.getInstructions();
-			for (Instruction ele: list) {
-				if (ele.getSign() != 4) {
-					String navIns = ele.getTurnDescription(list.getTr()) + ",covering about " + ele.getDistance() + " meters";
-					ins.add(navIns.toLowerCase());
-				} else {
-					String navIns = ele.getTurnDescription(list.getTr());
-					ins.add(navIns);
+		if(profile.length()!=0)
+		{
+			result.add(finalPath(p,profile));
+		}
+		else 
+		{
+			for(PathChoice pc:PathChoice.values())
+			{
+				if(!pc.toString().equals("all"))
+				{
+					
+					profile = TrafficAndRoutingService.getModeBasedPathChoice(pc, mode);
+					result.add(finalPath(p,profile));
 				}
 			}
-			pl = res.getPoints();
-		} finally {
-			result.fillPath(pl, ins);
-			result.setSummary(map);
-			readLock.unlock();
+		}
+		}
+		finally
+		{
+		readLock.unlock();
 		}
 		return result; //result contains latitudes and longitudes of route and instructions for navigation
-
 	}
 
 }

@@ -64,7 +64,8 @@ public class TrafficAndRoutingService {
 
 			for (PathChoice pc : PathChoice.values()) {
 				for (TransportMode tm : TransportMode.values()) {
-					profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
+					if(pc.toString().equals("all")==false)
+						profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
 				}
 			}
 
@@ -123,7 +124,7 @@ public class TrafficAndRoutingService {
 		ai.readJSON(this.boundingBox);
 	}
 
-	public RoutePath getPath(UrlContainer p)
+	public ArrayList<RoutePath> getPath(UrlContainer p)
 	{
 		return rp.find(p);
 	}

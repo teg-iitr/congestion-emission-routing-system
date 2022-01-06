@@ -1,4 +1,6 @@
 package com.map.app.controller;
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,15 +40,15 @@ public class MapControl {
 		
     UrlContainer rp=pt.convert();
 //    System.out.println(rp.toString());
-	RoutePath res=trs.getPath(rp);
+	ArrayList<RoutePath> res=trs.getPath(rp);
 	model.addAttribute("route",res);
-	model.addAttribute("bbox",res.getBounds());
+	model.addAttribute("bbox",res.get(0).getBounds());
    	return "index";
 	}
 	
 	@ResponseBody 
 	@RequestMapping(value = "/routing",method=RequestMethod.GET,produces="application/json")   
-	 public RoutePath fetchJSONResponse(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
+	 public ArrayList<RoutePath> fetchJSONResponse(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
 	 {
 		
 		 UrlContainer rp=pt.convert();
