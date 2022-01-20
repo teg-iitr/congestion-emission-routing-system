@@ -78,7 +78,7 @@ public class AppApplication {
 	   SpringApplication.run(AppApplication.class, args);
 			   
 	}
-	@Scheduled(fixedDelay=60*60*1000)
+	@Scheduled(fixedDelay=60*10*1000)
 	void jobInitializer()
 	{
 		ts.start();
