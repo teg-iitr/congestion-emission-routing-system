@@ -47,6 +47,7 @@ public class TrafficDataExtractor {
 				+boundingBox.minLat+","+boundingBox.minLon + ";"
 				+ boundingBox.maxLat + "," + boundingBox.maxLon +
 				"&responseattributes=sh,fc&units=metric";
+		//System.out.println(URL);
 		parse_XML(URL);
 	}
 
@@ -134,6 +135,22 @@ public class TrafficDataExtractor {
 					float cn = 0;
 					float ff = 0;
 					NodeList myxml = road.getChildNodes();
+					Element traf_info=(Element) road.getLastChild();
+					//System.out.println(tata.getAttribute("FF"));
+					if(traf_info!=null)
+					{
+					
+						if (traf_info.hasAttribute("FC")) {
+							fc = Float.parseFloat(traf_info.getAttribute("FC"));
+						}
+						if (traf_info.hasAttribute("CN")) {
+							cn = Float.parseFloat(traf_info.getAttribute("CN"));
+						}
+						if (traf_info.hasAttribute("SU")) {
+							su = Float.parseFloat(traf_info.getAttribute("SU"));
+						}
+					}
+					/*
 					for (int j = 0; j<myxml.getLength(); j++) {
 						Node child_1 = myxml.item(j);
 						if (child_1.getNodeType() == Node.ELEMENT_NODE) {
@@ -150,12 +167,11 @@ public class TrafficDataExtractor {
 							if (child.hasAttribute("SU")) {
 								su = Float.parseFloat(child.getAttribute("SU"));
 							}
-							if (child.hasAttribute("FF")) {
-								ff = Float.parseFloat(child.getAttribute("FF"));
-							}
+						
 
 						}
-					}
+					}*/
+					//System.out.println(fc+" "+cn+" "+su);
 					if (cn >= 0.7 && fc<= TrafficAndRoutingService.functional_road_class_here_maps) {
 
 						NodeList shps = road.getElementsByTagName("SHP");
@@ -170,11 +186,13 @@ public class TrafficDataExtractor {
 									String[] ans = shp.getTextContent().replace(',', ' ').split(" ");
 
 									if (k == 0) {
-										las.add(Float.parseFloat(ans[0]));
-										longs.add(Float.parseFloat(ans[1]));
+										if (shp.hasAttribute("FC")) {
+											fc = Float.parseFloat(shp.getAttribute("FC"));
+											//System.out.println(fc);
+										}
 									}
 
-									for (int l = 1; l< ans.length / 2; l++) {
+									for (int l = 0; l< ans.length / 2; l++) {
 										las.add(Float.parseFloat(ans[2 * l]));
 										longs.add(Float.parseFloat(ans[2 * l + 1]));
 									}

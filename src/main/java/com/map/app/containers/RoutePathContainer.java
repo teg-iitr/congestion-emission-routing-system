@@ -48,7 +48,7 @@ public class RoutePathContainer {
 						System.out.println("Distance in meters: " + res.getDistance());
 			//res.get
 			map.put("time", (float)(res.getTime() / (1000.))); // sec.
-						System.out.println("Time in minutes: " + res.getTime() / (60.*1000.));
+						System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
