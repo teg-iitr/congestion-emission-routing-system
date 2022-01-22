@@ -140,8 +140,8 @@ public class TrafficDataExtractor {
 					if(traf_info!=null)
 					{
 					
-						if (traf_info.hasAttribute("FC")) {
-							fc = Float.parseFloat(traf_info.getAttribute("FC"));
+						if (traf_info.hasAttribute("FF")) {
+							ff = Float.parseFloat(traf_info.getAttribute("FF"));
 						}
 						if (traf_info.hasAttribute("CN")) {
 							cn = Float.parseFloat(traf_info.getAttribute("CN"));
@@ -171,6 +171,17 @@ public class TrafficDataExtractor {
 
 						}
 					}*/
+					NodeList temp_shp = road.getElementsByTagName("SHP");
+					if (temp_shp.getLength() > 0) {
+						Node first_shp = temp_shp.item(0);
+						if (first_shp.getNodeType() == Node.ELEMENT_NODE) {
+							Element shp = (Element) first_shp;
+							if (shp.hasAttribute("FC")) {
+								fc = Float.parseFloat(shp.getAttribute("FC"));
+								//System.out.println(fc);
+							}
+						}
+					}
 					//System.out.println(fc+" "+cn+" "+su);
 					if (cn >= 0.7 && fc<= TrafficAndRoutingService.functional_road_class_here_maps) {
 
@@ -186,13 +197,13 @@ public class TrafficDataExtractor {
 									String[] ans = shp.getTextContent().replace(',', ' ').split(" ");
 
 									if (k == 0) {
-										if (shp.hasAttribute("FC")) {
-											fc = Float.parseFloat(shp.getAttribute("FC"));
-											//System.out.println(fc);
-										}
+								
+										las.add(Float.parseFloat(ans[0]));
+										longs.add(Float.parseFloat(ans[1]));
+										//System.out.println(las+" "+longs);
 									}
 
-									for (int l = 0; l< ans.length / 2; l++) {
+									for (int l = 1; l< ans.length / 2; l++) {
 										las.add(Float.parseFloat(ans[2 * l]));
 										longs.add(Float.parseFloat(ans[2 * l + 1]));
 									}
@@ -211,6 +222,7 @@ public class TrafficDataExtractor {
 				}
 
 			}
+			//System.out.println(tempdt.getLat());
 			feed(tempdt);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			// TODO Auto-generated catch block
