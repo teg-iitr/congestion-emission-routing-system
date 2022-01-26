@@ -14,7 +14,7 @@ import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PR
  * in seconds.
  * <p>
  *
- * @author Peter Karich
+ * @author Siftee 
  */
 public class BalancedWeighting extends FastestWeighting {
     private static final String NAME="balanced";
@@ -27,8 +27,8 @@ public class BalancedWeighting extends FastestWeighting {
     public BalancedWeighting(FlagEncoder encoder,PMap map,TurnCostProvider turnCostProvider)
     {
     	super(encoder, map, turnCostProvider);
-    	timeFactor=checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, 0.1), 0, 10);
-    	pollutionFactor=checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, 1.57), 0, 10);
+    	timeFactor=checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, 1), 0, 10);
+    	pollutionFactor=checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, 0.07), 0, 10);
     	smokeEnc=encoder.getDecimalEncodedValue("smoke");
     	if (timeFactor < 1e-5 && pollutionFactor < 1e-5)
             throw new IllegalArgumentException("[" + NAME + "] one of distance_factor or time_factor has to be non-zero");

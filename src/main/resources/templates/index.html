@@ -199,6 +199,8 @@
       	}
       	bb=document.getElementById('hid1').value.split(",")
       	console.log(bbox[0]+","+bb[1])
+      	console.log(bbox[1]+","+bb[1])
+      	
       	console.log(bbox[2]<bb[1])
       	if(bbox[0]>bb[1] || bbox[1]>bb[0] || bbox[2]<bb[1] || bbox[3]<bb[0])
       	{
@@ -284,12 +286,28 @@
       			{
       				let instruction=document.createElement('div');
       				instruction.id=i;
-      				instruction.style="border:1px dotted black; color:black;font-size:10px"
-      				if(data.length>1)
+      				
+      				
+      				if(i==data[j].navigationInstruction.length-1 || i==data[j].navigationInstruction.length-2 || i==data[j].navigationInstruction.length-3)
+  					{
+      					
+      					instruction.style="border:1px dotted black; color:red;font-size:10px"
+      						if(data.length>1)
+          					{
+          					instruction.style.backgroundColor=nav_color[j];
+          					}
+      					instruction.innerHTML+="<b>"+data[j].navigationInstruction[i]+"</b>";
+          				//continue;
+  					}
+      				else 
       					{
-      					instruction.style.backgroundColor=nav_color[j];
+      					instruction.style="border:1px dotted black; color:black;font-size:10px"
+      						if(data.length>1)
+          					{
+          					instruction.style.backgroundColor=nav_color[j];
+          					}
+      					instruction.innerHTML+="<b>"+(i+1)+" "+toTitleCase(data[j].navigationInstruction[i])+"</b>";
       					}
-      				instruction.innerHTML+="<b>"+(i+1)+" "+toTitleCase(data[j].navigationInstruction[i])+"</b>";
       				document.getElementById('instructionBox').appendChild(instruction);
       			}
       			

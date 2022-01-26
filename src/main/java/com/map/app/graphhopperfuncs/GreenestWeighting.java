@@ -15,7 +15,7 @@ public class GreenestWeighting extends AbstractWeighting {
 	private static final String NAME="greenest";
 	private final DecimalEncodedValue smokeEnc;
 	final DecimalEncodedValue avgSpeedEnc;
-    
+    private static int count=0;
 	protected GreenestWeighting(FlagEncoder encoder) {
 		this(encoder,NO_TURN_COST_PROVIDER);
 	}
@@ -26,7 +26,7 @@ public class GreenestWeighting extends AbstractWeighting {
     }
 	@Override
 	public double getMinWeight(double distance) {
-		return distance;
+		return 0;
 	}
 	@Override
 	public String getName() {
@@ -34,6 +34,12 @@ public class GreenestWeighting extends AbstractWeighting {
 	}
 	@Override
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
+		//System.out.println(edgeState.)
+		if(edgeState.get(smokeEnc)==0)
+		{
+			count++;
+			System.out.println(count);
+		}
 		return edgeState.get(smokeEnc);
 	}
 }

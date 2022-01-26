@@ -168,7 +168,6 @@ public class TrafficDataExtractor {
 								su = Float.parseFloat(child.getAttribute("SU"));
 							}
 						
-
 						}
 					}*/
 					NodeList temp_shp = road.getElementsByTagName("SHP");

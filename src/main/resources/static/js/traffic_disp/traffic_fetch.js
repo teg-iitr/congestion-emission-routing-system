@@ -19,7 +19,7 @@ function traffic_info() {
                 trafficLayer.redraw();
                 setTimeout(function() {
                     traffic_info();
-                }, 60 * 60 * 1000);
+                }, 60 *60* 1000);
             }
         })
     }
