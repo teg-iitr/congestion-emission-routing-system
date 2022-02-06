@@ -50,7 +50,7 @@ public class RoutePathContainer {
 				}
 			ResponsePath res = fullRes.getBest();
 			//System.out.println(res.getLegs().size());
-			System.out.println(profile);
+			//System.out.println(profile);
 			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),mode));
 			map.put("distance", (float)res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
