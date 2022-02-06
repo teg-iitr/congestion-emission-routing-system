@@ -49,13 +49,15 @@ public class RoutePathContainer {
 				throw new RuntimeException(fullRes.getErrors().toString());
 				}
 			ResponsePath res = fullRes.getBest();
-			double concScore=concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),mode);
+			//System.out.println(res.getLegs().size());
+			System.out.println(profile);
+			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),mode));
 			map.put("distance", (float)res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
 			
 			map.put("time", (float)(res.getTime() / (1000.))); // sec.
 						//System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
-			map.put("Concentration",(float) concScore); // sec.
+			map.put("mean aqi",(float) (concScore)); // sec.
 			
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
@@ -71,7 +73,7 @@ public class RoutePathContainer {
 
 			ins.add("DISTANCE IN METERS: "+res.getDistance());
 			ins.add("TIME IN MINUTES: "+((res.getTime()/(60))/1000));
-			ins.add("CONCENTRATION SCORE: "+concScore);
+			ins.add("SUM OF CONCENTRATION SCORE: "+concScore);
 
 			pl = res.getPoints();
 			} 

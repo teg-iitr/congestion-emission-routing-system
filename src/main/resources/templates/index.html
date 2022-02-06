@@ -111,6 +111,7 @@
       //Creating leaflet map and adding tile layer
       // TODO the map view must change based on the OSM file.
        var bbox=/*[[${bbox}]]*/"";
+     // console.log(bbox);
       var map = L.map('mapid');
       map.fitBounds([ [bbox[0],bbox[1]] , [bbox[2],bbox[3]]]);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -149,18 +150,25 @@
       //Initialize the geocoder
       var geocoderControl1 = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map)
       .on('focus', function (e) {
-    	  console.log("hi!!");
+    	  //console.log("hi!!");
     	  document.getElementById("inputbox2").style.display = "none";
       })
       .on('select', function (e) {
           putValue(document.getElementById('hid1'),e.latlng.lat, e.latlng.lng);
+          //bb=document.getElementById('hid1').value.split(",");
+      	//console.log(bbox[0]+","+bbox[2]+" "+bb[1]);
+      	//console.log(bbox[1]+","+bbox[3]+" "+bb[0]);
       })
       .on('blur', function (e) {
-          console.log("efe2");
+          //console.log("efe2");
           document.getElementById("inputbox2").style.display = "block";
       });
       var geocoderControl2 = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
           putValue(document.getElementById('hid2'),e.latlng.lat, e.latlng.lng);
+          //bb=document.getElementById('hid2').value.split(",");
+        	//console.log(bbox[0]+","+bbox[2]+" "+bb[1]);
+        	//console.log(bbox[1]+","+bbox[3]+" "+bb[0]);
+        	
       });
       
       //Get the "search-box" div
@@ -179,6 +187,8 @@
    //put value of geocoded lat longs
    function putValue(container,lat,lng)
    {
+	   //console.log(lat+" "+lng)
+	   
 	   container.value=lng+","+lat;
 	  
    }
@@ -198,10 +208,10 @@
       	 return false;
       	}
       	bb=document.getElementById('hid1').value.split(",")
-      	console.log(bbox[0]+","+bb[1])
-      	console.log(bbox[1]+","+bb[1])
-      	
-      	console.log(bbox[2]<bb[1])
+      	//console.log(bbox[0]+","+bbox[2]+" "+bb[1])
+      	//console.log(bbox[1]+","+bbox[3]+" "+bb[0])
+      	//console.log(bbox);
+      	//console.log(bbox[2]<bb[1])
       	if(bbox[0]>bb[1] || bbox[1]>bb[0] || bbox[2]<bb[1] || bbox[3]<bb[0])
       	{
       		alert("Source ("+bb[1]+","+bb[0]+") is out of bounds for the bounding box = ["+bbox[0]+","+bbox[1]+" "+bbox[2]+","+bbox[3]+"]")
@@ -210,7 +220,7 @@
       	bb=document.getElementById('hid2').value.split(",")
       	if(bbox[0]>bb[1] || bbox[1]>bb[0] || bbox[2]<bb[1] || bbox[3]<bb[0])
       	{
-      		alert("Source ("+bb[1]+","+bb[0]+") is out of bounds for the bounding box = ["+bbox[0]+","+bbox[1]+" "+bbox[2]+","+bbox[3]+"]")
+      		alert("Destination ("+bb[1]+","+bb[0]+") is out of bounds for the bounding box = ["+bbox[0]+","+bbox[1]+" "+bbox[2]+","+bbox[3]+"]")
       	return false;
       	}
       	
@@ -220,13 +230,16 @@
       */      	
       function codeAddress() {
 
-          
+          //console.log(bbox);
       	 var data=/*[[${route}]]*/"";
-      	 
+      	 var rbbox=/*[[${rbbox}]]*/"";
       	 if(data!=null)
       		 {
       		 console.log(data);
-      
+      		 if(rbbox!="")
+      			 {
+      			map.fitBounds([ [rbbox[0],rbbox[1]] , [rbbox[2],rbbox[3]]]);
+      			 }
       		 document.getElementById('hid1').value="";
       		 document.getElementById('hid2').value="";
       		 const nav_color=["LightCoral","LightGreen","PowderBlue","LightSalmon"];
@@ -250,7 +263,7 @@
   			instructionBox.style="background-color:rgb(210 229 219);color:forestgreen;font-size:20px;overflow:auto";
   			document.getElementById('instructionBox').style.height=250+'px';
   			instructionBox.innerHTML+="Turn-By-Turn Navigation"
-  			console.log(instructionBox.style.height);
+  			//console.log(instructionBox.style.height);
   			
       		 for(let j=0;j<data.length;j++)
       			 {
@@ -291,7 +304,7 @@
       				if(i==data[j].navigationInstruction.length-1 || i==data[j].navigationInstruction.length-2 || i==data[j].navigationInstruction.length-3)
   					{
       					
-      					instruction.style="border:1px dotted black; color:red;font-size:10px"
+      					instruction.style="border:1px dotted black; color:purple;font-size:10px"
       						if(data.length>1)
           					{
           					instruction.style.backgroundColor=nav_color[j];

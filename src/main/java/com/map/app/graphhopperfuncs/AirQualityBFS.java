@@ -39,7 +39,7 @@ public class AirQualityBFS extends XFirstSearch {
 	protected GHBitSet createBitSet() {
 		return new GHBitSetImpl();
 	}
-
+	//public double get
 	@Override
 	public void start(EdgeExplorer explorer, int temp) {
 		//System.out.println(hopper.)
@@ -77,7 +77,7 @@ public class AirQualityBFS extends XFirstSearch {
 						// edge.setFl
 						count++;
 					} else {
-						edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
+						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
 						//System.out.println(edge.get(smokeEnc));
 						count++;
 					}
@@ -86,13 +86,14 @@ public class AirQualityBFS extends XFirstSearch {
 			}
 			// System.out.println(visited.getCardinality());
 
-			System.out.println("Count is " + count);
+			//System.out.println("Count is " + count);
 		}
 	}
 
-	private int BFS(EdgeExplorer explorer, GHBitSet visited, SimpleIntDeque fifo, DecimalEncodedValue smokeEnc) {
+	/*private int BFS(EdgeExplorer explorer, GHBitSet visited, SimpleIntDeque fifo, DecimalEncodedValue smokeEnc) {
 		int current;
 		int count = 0;
+		//System.out.println(smokeEnc.)
 		while (!fifo.isEmpty()) {
 			current = fifo.pop();
 			// if (!goFurther(current))
@@ -116,7 +117,7 @@ public class AirQualityBFS extends XFirstSearch {
 						edge.set(smokeEnc, 0.);
 						// count++;
 					} else {
-						edge.set(smokeEnc, (airQualityBase + airQualityAdj) / 2);
+						edge.set(smokeEnc,convToConc((airQualityBase + airQualityAdj) / 2));
 						// System.out.println(edge.get(smokeEnc));
 						// count++;
 					}
@@ -128,8 +129,37 @@ public class AirQualityBFS extends XFirstSearch {
 
 		}
 		return count;
+	}*/
+	
+	public double convToConc(double aqi)
+	{
+		if(aqi>=0 && aqi<=50)		
+		{			return aqi*0.308;		
+		}		
+		else if(aqi>=51 && aqi<=100)		
+		{			
+			return ((aqi-51)*0.508) + 15.5;		
+		}		
+		else if(aqi>=101 && aqi<=150)		
+		{			
+			return ((aqi-101)*0.508)+40.5;		
+		}		
+		else if(aqi>=151 && aqi<=200)	
+		{			
+			return ((aqi-151)*1.73)+65.5;		
+		}		
+		else if(aqi>=201 && aqi<=300)		
+		{			
+			return ((aqi-201)*1.009)+150.5;		
+		}		
+		else if(aqi>=301 && aqi<=400) 
+			return ((aqi-301)*1.009)+250.2; 
+		else		
+		{	
+			return ((aqi-401)*1.51)+350.5;		
+		}
 	}
-
+	
 	private double IDW(double fromlat, double fromlon) {
 		double numer = 0;
 		double denom = 0;

@@ -73,8 +73,10 @@ public class TrafficDataExtractor {
 				List<Float> entryLats = dt.getLat().get(i);
 				List<Float> entryLons = dt.getLons().get(i);
 				List<Float> entrySpeed = dt.getSpeed().get(i);
-				Float latitude = entryLats.get(entryLats.size() / 2);
-				Float longitude = entryLons.get(entryLons.size() / 2);
+				for(int j=0;j<entryLats.size();j++)
+				{
+				Float latitude = entryLats.get(j);
+				Float longitude = entryLons.get(j);
 				Snap qr = locationIndex.findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
 				if (!qr.isValid()) {
 					// logger.info("no matching road found for entry " + entry.getId() + " at " + point);
@@ -106,9 +108,10 @@ public class TrafficDataExtractor {
 				double oldValue = edge.get(avgSpeedEnc);
 				if (value != oldValue) {
 //					updates++;
-					
+					//System.out.println(avgSpeedEnc.getMaxDecimal());
 					edge.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
 				}
+			}
 			}
 		}
 	}

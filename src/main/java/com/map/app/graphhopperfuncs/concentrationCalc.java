@@ -13,34 +13,33 @@ import com.graphhopper.util.details.PathDetail;
 import com.map.app.service.TransportMode;
 
 public class concentrationCalc {
-	public static double convToConc(double aqi)
+	/*public static double convToAQI(double conc)
 	{
-		if(aqi>=0 && aqi<=50)		
-		{			return aqi*0.308;		
-		}		
-		else if(aqi>=51 && aqi<=100)		
-		{			
-			return ((aqi-51)*0.508) + 15.5;		
-		}		
-		else if(aqi>=101 && aqi<=150)		
-		{			
-			return ((aqi-101)*0.508)+40.5;		
-		}		
-		else if(aqi>=151 && aqi<=200)	
-		{			
-			return ((aqi-151)*1.73)+65.5;		
-		}		
-		else if(aqi>=201 && aqi<=300)		
-		{			
-			return ((aqi-201)*1.009)+150.5;		
-		}		
-		else if(aqi>=301 && aqi<=400) 
-			return ((aqi-301)*1.009)+250.2; 
-		else		
-		{	
-			return ((aqi-401)*1.51)+350.5;		
+		if(conc<30)
+		{
+			return conc*1.67;
 		}
-	}
+		else if(conc>=30 && conc<60)
+		{
+			return 50+(1.67*(conc-30));
+		}
+		else if(conc>=60 && conc<90)
+		{
+			return 100+(3.33*(conc-60));
+		}
+		else if(conc>=90 && conc<120)
+		{
+			return 200+(3.33*(conc-90));
+		}
+		else if(conc>-120 && conc<=250)
+		{
+			return 300+(0.77*(conc-120));
+		}
+		else
+		{
+			return 400+(0.77*(conc-250));
+		}
+	}*/
 	public static double calcConcentrationScore(GraphHopper gh,List<PathDetail> pathDetails,TransportMode mode)
 	{
 		int score=0;
@@ -50,8 +49,12 @@ public class concentrationCalc {
 			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
 			EdgeIteratorState edge = g.getEdgeIteratorState((Integer)detail.getValue(), Integer.MIN_VALUE);
 			//convToConc() System.out.println(edge.get(smokeEnc));
-			score+=convToConc(edge.get(smokeEnc));
+			score+=smokeEnc.getDecimal(false, edge.getFlags());
 			}
+		
+		//System.out.println(pathDetails.size());
+//		System.out.println(score);
+		//return score;
 		return score;
 	}
 }

@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.shapes.BBox;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,6 +20,7 @@ import org.json.simple.parser.JSONParser;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.Graph;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
+import com.map.app.graphhopperfuncs.GreenestWeighting;
 import com.map.app.model.AirQuality;
 
 /**
@@ -27,15 +30,14 @@ import com.map.app.model.AirQuality;
 public class AirQualityDataExtractor {
 	private final JSONParser jsonP;
 	private final Lock writeLock;
-	private final ArrayList<AirQuality> ap;
+	private  ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
 	private String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
 
-	public AirQualityDataExtractor(GraphHopper hopper, Lock lock) {
-		this.hopper = hopper;
+	public AirQualityDataExtractor(GraphHopper ghopper, Lock lock) {
+		hopper = ghopper;
 		this.jsonP = new JSONParser();
-		this.ap = new ArrayList<>();
 		this.writeLock = lock;
 		if (aqiApiKey ==null) {
 			Properties prop=new Properties();
@@ -47,6 +49,7 @@ public class AirQualityDataExtractor {
 			}
 		}
 	}
+	
 	public void readJSON(BBox boundingBox) {
 		/*
 		 Fetching the content from the api and parsing the json result
@@ -55,6 +58,7 @@ public class AirQualityDataExtractor {
 			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
 		}
 		try {
+			writeLock.lock();
 			URL uri = new URL(url+boundingBox.minLat+","+boundingBox.minLon + ","
 					+ boundingBox.maxLat + "," + boundingBox.maxLon +"&token=" + aqiApiKey );
 	//URL uri = new URL("https://api.waqi.info/map/bounds/?latlng=28.4400008,76.9800032,28.7399996,77.4999977&token=25fe488654ba5a53ed760d2e0ac66b421255aeb5");
@@ -65,6 +69,8 @@ public class AirQualityDataExtractor {
 			if (responseCode != 200) {
 				throw new RuntimeException("HttpResponseCode: " + responseCode);
 			}
+			ap = new ArrayList<>();
+			//avgConc=0;
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuilder response = new StringBuilder();
@@ -110,20 +116,20 @@ public class AirQualityDataExtractor {
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 //			LocationIndex locationIndex = hopper.getLocationIndex();
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
-			writeLock.lock();
-			try {
+			
 				trav.start(gh.createEdgeExplorer(), 0);
-			} finally {
-				writeLock.unlock();
-			}
-		} catch (Exception e) {
+			} 
+		catch (Exception e) {
+			
 			e.printStackTrace();
 		}
 		finally 
 		{
+			writeLock.unlock();
 			System.out.println("WAQI API parsing done...");
 		}
 
 	}
+	
 
 }

@@ -94,6 +94,7 @@ public class TrafficAndRoutingService {
     	
     	//gh.set
     	this.boundingBox = gh.getGraphHopperStorage().getBaseGraph().getBounds();
+    	//System.out.println(boundingBox);
     	//System.out.println(this.boundingBox);
     	dt=new TrafficDataExtractor(gh,lock.writeLock());
     	rp=new RoutePathContainer(gh, lock.readLock());

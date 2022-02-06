@@ -42,7 +42,8 @@ public class MapControl {
 //    System.out.println(rp.toString());
 	ArrayList<RoutePath> res=trs.getPath(rp);
 	model.addAttribute("route",res);
-	model.addAttribute("bbox",res.get(0).getBounds());
+	model.addAttribute("bbox",trs.getBoundingBox());
+	model.addAttribute("rbbox",res.get(0).getBounds());
    	return "index";
 	}
 	
