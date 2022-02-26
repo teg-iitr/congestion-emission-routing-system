@@ -47,7 +47,7 @@ public class TrafficDataExtractor {
 				+boundingBox.minLat+","+boundingBox.minLon + ";"
 				+ boundingBox.maxLat + "," + boundingBox.maxLon +
 				"&responseattributes=sh,fc&units=metric";
-		//System.out.println(URL);
+		System.out.println(URL);
 		parse_XML(URL);
 	}
 
@@ -106,6 +106,10 @@ public class TrafficDataExtractor {
 				}
 				DecimalEncodedValue avgSpeedEnc = encoder.getAverageSpeedEnc();
 				double oldValue = edge.get(avgSpeedEnc);
+				if(edge.getEdge()==157458)
+				{
+					System.out.println(value+" "+hopper.getGraphHopperStorage().getNodeAccess().getLat(edge.getBaseNode())+""+hopper.getGraphHopperStorage().getNodeAccess().getLon(edge.getBaseNode()));
+				}
 				if (value != oldValue) {
 //					updates++;
 					//System.out.println(avgSpeedEnc.getMaxDecimal());

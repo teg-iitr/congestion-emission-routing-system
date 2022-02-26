@@ -40,21 +40,36 @@ public class concentrationCalc {
 			return 400+(0.77*(conc-250));
 		}
 	}*/
-	public static double calcConcentrationScore(GraphHopper gh,List<PathDetail> pathDetails,TransportMode mode)
+	public static double calcConcentrationScore(GraphHopper gh,List<PathDetail> pathDetails,List<PathDetail> pathDetailsTime,TransportMode mode)
 	{
-		int score=0;
+		double score=0;
+		double sum=0;
+		//System.out.println(pathDetailsConc);
+		//System.out.println(pathDetailsTime);
+		
+		//System.out.println(pathDetailsConc.size()+" "+pathDetailsTime.size());
+		
 		Graph g=gh.getGraphHopperStorage().getBaseGraph();
-		for (PathDetail detail : pathDetails) {
+		for (int i=0;i<pathDetails.size();i++) {
+			//System.out
+			PathDetail detail=pathDetails.get(i);
+			PathDetail time=pathDetailsTime.get(i);
 			FlagEncoder encoder = gh.getEncodingManager().getEncoder(mode.toString());
 			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
 			EdgeIteratorState edge = g.getEdgeIteratorState((Integer)detail.getValue(), Integer.MIN_VALUE);
-			//convToConc() System.out.println(edge.get(smokeEnc));
-			score+=smokeEnc.getDecimal(false, edge.getFlags());
+			//convToConc() 
+			//System.out.println(edge.getDistance()+" "+edge.get(smokeEnc));
+			//System.out.println((Long)time.getValue());
+			score+=smokeEnc.getDecimal(false, edge.getFlags())*(((Long)time.getValue())/36000);
+			//System.out.println(smokeEnc.getDecimal(false, edge.getFlags()));
+			//sum+=(Long)time.getValue();
 			}
 		
 		//System.out.println(pathDetails.size());
-//		System.out.println(score);
+		//System.out.println(score);
+		//System.out.println(sum);
+		
 		//return score;
-		return score;
+		return score;//sum;
 	}
 }

@@ -36,7 +36,8 @@ public class RoutePathContainer {
 		RoutePath indiv=new RoutePath();
 		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
 		request.setPathDetails(Arrays.asList(
-                Parameters.Details.EDGE_ID
+                Parameters.Details.EDGE_ID,
+                Parameters.Details.TIME
         ));
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();
@@ -51,14 +52,17 @@ public class RoutePathContainer {
 			ResponsePath res = fullRes.getBest();
 			//System.out.println(res.getLegs().size());
 			//System.out.println(profile);
-			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),mode));
+			//System.out.println(res.getRouteWeight());
+			
+			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),res.getPathDetails().get(Parameters.Details.TIME),mode));
 			map.put("distance", (float)res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
 			
 			map.put("time", (float)(res.getTime() / (1000.))); // sec.
 						//System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
 			map.put("mean aqi",(float) (concScore)); // sec.
-			
+			//System.out.println(res.getTime()/(1000.));
+			//System.out.println(res.getDistance());
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {

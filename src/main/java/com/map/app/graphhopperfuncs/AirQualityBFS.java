@@ -50,6 +50,8 @@ public class AirQualityBFS extends XFirstSearch {
 		for (TransportMode encoder : TransportMode.values()) {
 			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
 			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
+			DecimalEncodedValue avgSpeedEnc = Encoder.getAverageSpeedEnc();
+			
 			// SimpleIntDeque fifo = new SimpleIntDeque();
 			// GHBitSet visited = createBitSet();
 			// System.out.println("KYA"+gh.getNodes());
@@ -77,8 +79,12 @@ public class AirQualityBFS extends XFirstSearch {
 						// edge.setFl
 						count++;
 					} else {
+						/*if(avgSpeedEnc.getDecimal(false, edge.getFlags())==0)
+						{
+							System.out.println(edge.getEdge());
+						}*/
 						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
-						//System.out.println(edge.get(smokeEnc));
+						//System.out.println();
 						count++;
 					}
 					edge_uni.add(edge.getEdge());

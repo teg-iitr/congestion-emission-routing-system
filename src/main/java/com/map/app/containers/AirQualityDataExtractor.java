@@ -63,7 +63,7 @@ public class AirQualityDataExtractor {
 					+ boundingBox.maxLat + "," + boundingBox.maxLon +"&token=" + aqiApiKey );
 	//URL uri = new URL("https://api.waqi.info/map/bounds/?latlng=28.4400008,76.9800032,28.7399996,77.4999977&token=25fe488654ba5a53ed760d2e0ac66b421255aeb5");
 			
-			//System.out.println(uri);
+			System.out.println(uri);
 			HttpURLConnection con = (HttpURLConnection) uri.openConnection();
 			int responseCode = con.getResponseCode();
 			if (responseCode != 200) {

@@ -1,8 +1,10 @@
 package com.map.app.graphhopperfuncs;
 
 import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.RoadAccess;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.AbstractWeighting;
+import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIteratorState;
@@ -17,10 +19,10 @@ import java.util.ArrayList;
 /**
  * @author Siftee
  */
-public class GreenestWeighting extends AbstractWeighting {
+public class GreenestWeighting extends FastestWeighting {
 	private static final String NAME="greenest";
 	private final DecimalEncodedValue smokeEnc;
-	//final DecimalEncodedValue avgSpeedEnc;
+	private final DecimalEncodedValue avgSpeedEnc;
     //private static int avgCount=0;
 	
 	
@@ -30,7 +32,7 @@ public class GreenestWeighting extends AbstractWeighting {
 	public GreenestWeighting(FlagEncoder flagEncoder, TurnCostProvider TurnCostProvider) {
 		super(flagEncoder, TurnCostProvider);
 		smokeEnc=flagEncoder.getDecimalEncodedValue("smoke");
-	//    avgSpeedEnc=flagEncoder.getAverageSpeedEnc();
+	    avgSpeedEnc=flagEncoder.getAverageSpeedEnc();
     }
 	@Override
 	public double getMinWeight(double distance) {
@@ -40,7 +42,7 @@ public class GreenestWeighting extends AbstractWeighting {
 	public String getName() {
 		return NAME;
 	}
-	
+
 	
 	@Override
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
@@ -64,9 +66,9 @@ public class GreenestWeighting extends AbstractWeighting {
 			 //System.out.println("******************** Smoke values: " + smoke);
 		       
 		//}
-        double calcEdgeWeight = smoke;
-
-        
+        double calcEdgeWeight = smoke*(super.calcEdgeWeight(edgeState, reverse)/36000);
+        //System.out.println("Smoke"+smoke);
+        //System.out.println("Time"+super.calcEdgeWeight(edgeState, reverse));
         return calcEdgeWeight;
 	}
 	
