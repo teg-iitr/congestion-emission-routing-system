@@ -66,7 +66,12 @@ public class GreenestWeighting extends FastestWeighting {
 			 //System.out.println("******************** Smoke values: " + smoke);
 		       
 		//}
-        double calcEdgeWeight = smoke*(super.calcEdgeWeight(edgeState, reverse)/36000);
+		double time=super.calcEdgeWeight(edgeState, reverse);
+		if(time==Double.POSITIVE_INFINITY)
+		{
+			return time;
+		}
+        double calcEdgeWeight = smoke*time;
         //System.out.println("Smoke"+smoke);
         //System.out.println("Time"+super.calcEdgeWeight(edgeState, reverse));
         return calcEdgeWeight;

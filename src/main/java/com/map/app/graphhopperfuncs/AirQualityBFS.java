@@ -50,7 +50,7 @@ public class AirQualityBFS extends XFirstSearch {
 		for (TransportMode encoder : TransportMode.values()) {
 			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
 			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
-			DecimalEncodedValue avgSpeedEnc = Encoder.getAverageSpeedEnc();
+			//DecimalEncodedValue avgSpeedEnc = Encoder.getAverageSpeedEnc();
 			
 			// SimpleIntDeque fifo = new SimpleIntDeque();
 			// GHBitSet visited = createBitSet();

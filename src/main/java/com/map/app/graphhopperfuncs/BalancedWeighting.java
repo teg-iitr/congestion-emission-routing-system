@@ -50,8 +50,12 @@ public class BalancedWeighting extends FastestWeighting {
     @Override
     public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
         double time = super.calcEdgeWeight(edgeState, reverse);
+        if(time==Double.POSITIVE_INFINITY)
+        {
+        	return Double.POSITIVE_INFINITY;
+        }
         //*(time/3600000)
-        return time * timeFactor + (smokeEnc.getDecimal(false, edgeState.getFlags())) * pollutionFactor;
+        return time * timeFactor + (smokeEnc.getDecimal(false, edgeState.getFlags())*time) * pollutionFactor;
     }
     @Override
     public String getName() {
