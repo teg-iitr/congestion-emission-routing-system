@@ -14,6 +14,7 @@ import com.map.app.model.AirQuality;
 import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PROVIDER;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 /**
@@ -71,9 +72,10 @@ public class GreenestWeighting extends FastestWeighting {
 		{
 			return time;
 		}
-        double calcEdgeWeight = smoke*time;
-        //System.out.println("Smoke"+smoke);
-        //System.out.println("Time"+super.calcEdgeWeight(edgeState, reverse));
+        double calcEdgeWeight = smoke *time;
+//        System.out.println("Smoke"+smoke);
+//		System.out.println("Distance"+edgeState.getDistance());
+//        System.out.println("Time"+super.calcEdgeWeight(edgeState, reverse));
         return calcEdgeWeight;
 	}
 	

@@ -61,7 +61,6 @@ public class AirQualityDataExtractor {
 			writeLock.lock();
 			URL uri = new URL(url+boundingBox.minLat+","+boundingBox.minLon + ","
 					+ boundingBox.maxLat + "," + boundingBox.maxLon +"&token=" + aqiApiKey );
-	//URL uri = new URL("https://api.waqi.info/map/bounds/?latlng=28.4400008,76.9800032,28.7399996,77.4999977&token=25fe488654ba5a53ed760d2e0ac66b421255aeb5");
 			
 			System.out.println(uri);
 			HttpURLConnection con = (HttpURLConnection) uri.openConnection();
@@ -77,7 +76,6 @@ public class AirQualityDataExtractor {
 			while ((inputLine = in .readLine()) != null) {
 				response.append(inputLine);
 			}
-		//	 System.out.println(response.toString());
 			in .close();
 
 			JSONObject obj = (JSONObject) jsonP.parse(response.toString());
@@ -116,8 +114,7 @@ public class AirQualityDataExtractor {
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 //			LocationIndex locationIndex = hopper.getLocationIndex();
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
-			
-				trav.start(gh.createEdgeExplorer(), 0);
+			trav.start(gh.createEdgeExplorer(), 0);
 			} 
 		catch (Exception e) {
 			

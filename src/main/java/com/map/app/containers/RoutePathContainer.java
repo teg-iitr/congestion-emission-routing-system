@@ -13,7 +13,7 @@ import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 import com.map.app.model.UrlContainer;
-import com.map.app.graphhopperfuncs.concentrationCalc;
+import com.map.app.graphhopperfuncs.ConcentrationCalculator;
 import com.map.app.model.RoutePath;
 import com.map.app.service.PathChoice;
 import com.map.app.service.TrafficAndRoutingService;
@@ -54,7 +54,7 @@ public class RoutePathContainer {
 			//System.out.println(profile);
 			//System.out.println(res.getRouteWeight());
 			
-			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),res.getPathDetails().get(Parameters.Details.TIME),mode));
+			double concScore=(ConcentrationCalculator.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),res.getPathDetails().get(Parameters.Details.TIME),mode));
 			map.put("distance", (float)res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
 			
@@ -77,7 +77,7 @@ public class RoutePathContainer {
 
 			ins.add("DISTANCE IN METERS: "+res.getDistance());
 			ins.add("TIME IN MINUTES: "+((res.getTime()/(60))/1000));
-			ins.add("SUM OF CONCENTRATION SCORE: "+concScore);
+			ins.add("SUM OF CONCENTRATION SCORE (gm-h): "+concScore);
 
 			pl = res.getPoints();
 			} 
@@ -112,7 +112,7 @@ public class RoutePathContainer {
 			default:
 				 mode= TransportMode.valueOf(p.getVehicle());
 				 pathChoice= PathChoice.valueOf(p.getRouteType());
-				 if(pathChoice.toString().equals("all")==false)
+				 if(!pathChoice.toString().equals("all"))
 					profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice, mode);
 				break;
 		}

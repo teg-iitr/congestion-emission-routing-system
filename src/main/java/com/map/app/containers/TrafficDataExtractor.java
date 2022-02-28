@@ -106,10 +106,10 @@ public class TrafficDataExtractor {
 				}
 				DecimalEncodedValue avgSpeedEnc = encoder.getAverageSpeedEnc();
 				double oldValue = edge.get(avgSpeedEnc);
-				if(edge.getEdge()==157458)
-				{
-					System.out.println(value+" "+hopper.getGraphHopperStorage().getNodeAccess().getLat(edge.getBaseNode())+""+hopper.getGraphHopperStorage().getNodeAccess().getLon(edge.getBaseNode()));
-				}
+//				if(edge.getEdge()==157458)
+//				{
+//					System.out.println(value+" "+hopper.getGraphHopperStorage().getNodeAccess().getLat(edge.getBaseNode())+""+hopper.getGraphHopperStorage().getNodeAccess().getLon(edge.getBaseNode()));
+//				}
 				if (value != oldValue) {
 //					updates++;
 					//System.out.println(avgSpeedEnc.getMaxDecimal());

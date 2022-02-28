@@ -8,13 +8,11 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHBitSet;
 import com.graphhopper.coll.GHBitSetImpl;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
-import com.graphhopper.util.SimpleIntDeque;
 import com.graphhopper.util.XFirstSearch;
 import com.map.app.model.AirQuality;
 import com.map.app.service.TransportMode;
@@ -83,7 +81,7 @@ public class AirQualityBFS extends XFirstSearch {
 						{
 							System.out.println(edge.getEdge());
 						}*/
-						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
+						edge.set(smokeEnc, Math.max(ConcentrationCalculator.aqiToConcentration((airQualityBase + airQualityAdj) / 2), 0));
 						//System.out.println();
 						count++;
 					}
@@ -136,35 +134,6 @@ public class AirQualityBFS extends XFirstSearch {
 		}
 		return count;
 	}*/
-	
-	public double convToConc(double aqi)
-	{
-		if(aqi>=0 && aqi<=50)		
-		{			return aqi*0.308;		
-		}		
-		else if(aqi>=51 && aqi<=100)		
-		{			
-			return ((aqi-51)*0.508) + 15.5;		
-		}		
-		else if(aqi>=101 && aqi<=150)		
-		{			
-			return ((aqi-101)*0.508)+40.5;		
-		}		
-		else if(aqi>=151 && aqi<=200)	
-		{			
-			return ((aqi-151)*1.73)+65.5;		
-		}		
-		else if(aqi>=201 && aqi<=300)		
-		{			
-			return ((aqi-201)*1.009)+150.5;		
-		}		
-		else if(aqi>=301 && aqi<=400) 
-			return ((aqi-301)*1.009)+250.2; 
-		else		
-		{	
-			return ((aqi-401)*1.51)+350.5;		
-		}
-	}
 	
 	private double IDW(double fromlat, double fromlon) {
 		double numer = 0;
