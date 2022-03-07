@@ -3,6 +3,7 @@ package com.map.app.graphhopperfuncs;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.AbstractWeighting;
+import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIteratorState;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 /**
  * @author Siftee
  */
-public class GreenestWeighting extends AbstractWeighting {
+public class GreenestWeighting extends FastestWeighting {
 	private static final String NAME="greenest";
 	private final DecimalEncodedValue smokeEnc;
 	//final DecimalEncodedValue avgSpeedEnc;
@@ -58,16 +59,11 @@ public class GreenestWeighting extends AbstractWeighting {
 		//return val;
 		
 		//return edgeState.get(smokeEnc);
-		double smoke = smokeEnc.getDecimal(false, edgeState.getFlags());
-		//if(smoke==0)
-		//{
-			 //System.out.println("******************** Smoke values: " + smoke);
-		       
-		//}
-        double calcEdgeWeight = smoke;
-
-        
-        return calcEdgeWeight;
+		double smoke = smokeEnc.getDecimal(reverse, edgeState.getFlags());
+		if(smoke!=0)
+			 System.out.println("greenest smoke " + smoke);
+		System.out.println("greenest time " + super.calcEdgeWeight(edgeState, reverse));
+        return smoke * super.calcEdgeWeight(edgeState, reverse);
 	}
 	
 }
