@@ -3,6 +3,7 @@ package com.map.app.containers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -34,10 +35,12 @@ public class RoutePathContainer {
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
 	{
 		RoutePath indiv=new RoutePath();
+		// set routing algorithm
 		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
-		request.setPathDetails(Arrays.asList(
-                Parameters.Details.EDGE_ID
-        ));
+		request.setPathDetails(List.of(
+				Parameters.Details.EDGE_ID
+		));
+//		request.setAlgorithm(Parameters.Algorithms.ALT_ROUTE);
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();
 		ArrayList<String> ins = new ArrayList<>();
@@ -108,7 +111,7 @@ public class RoutePathContainer {
 			default:
 				 mode= TransportMode.valueOf(p.getVehicle());
 				 pathChoice= PathChoice.valueOf(p.getRouteType());
-				 if(pathChoice.toString().equals("all")==false)
+				 if(!pathChoice.toString().equals("all"))
 					profile = TrafficAndRoutingService.getModeBasedPathChoice(pathChoice, mode);
 				break;
 		}

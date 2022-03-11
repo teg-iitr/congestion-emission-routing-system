@@ -8,13 +8,11 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHBitSet;
 import com.graphhopper.coll.GHBitSetImpl;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
-import com.graphhopper.util.SimpleIntDeque;
 import com.graphhopper.util.XFirstSearch;
 import com.map.app.model.AirQuality;
 import com.map.app.service.TransportMode;
@@ -46,7 +44,9 @@ public class AirQualityBFS extends XFirstSearch {
 		// System.out.println(ap);
 
 		//System.out.println(.getAllEdges());
-		
+		for (AirQuality airQuality : ap) {
+			System.out.println(airQuality);
+		}
 		for (TransportMode encoder : TransportMode.values()) {
 			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
 			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
@@ -55,7 +55,7 @@ public class AirQualityBFS extends XFirstSearch {
 			// System.out.println("KYA"+gh.getNodes());
 			int count = 0;
 			Set<Integer> edge_uni=new HashSet<>();
-			for (int startNode = 0; startNode < gh.getNodes(); startNode++) {
+			for (int startNode = temp; startNode < gh.getNodes(); startNode++) {
 				EdgeIterator edgeIterator = explorer.setBaseNode(startNode);
 				while (edgeIterator.next()) {
 					EdgeIteratorState edge = gh.getEdgeIteratorState(edgeIterator.getEdge(), Integer.MIN_VALUE);
@@ -70,13 +70,17 @@ public class AirQualityBFS extends XFirstSearch {
 					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
 					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
-					
+					int apValue = 999;
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
+//						edge.set(smokeEnc, apValue);
 						edge.set(smokeEnc, 0.);
 						//System.out.println(smokeEnc);
 						// edge.setFl
 						count++;
 					} else {
+//						if (convToConc((airQualityBase + airQualityAdj) / 2) < 0)
+//							edge.set(smokeEnc, apValue);
+//						else edge.set(smokeEnc, convToConc((airQualityBase + airQualityAdj) / 2));
 						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
 						//System.out.println(edge.get(smokeEnc));
 						count++;
