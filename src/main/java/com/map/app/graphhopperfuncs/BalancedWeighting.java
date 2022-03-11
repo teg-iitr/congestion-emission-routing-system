@@ -7,8 +7,6 @@ import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PMap;
 
-import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PROVIDER;
-
 /**
  * Calculates the fastest least air polluted route with the specified vehicle (VehicleEncoder). Calculates the weight
  * in seconds.
@@ -27,35 +25,25 @@ public class BalancedWeighting extends FastestWeighting {
     public BalancedWeighting(FlagEncoder encoder,PMap map,TurnCostProvider turnCostProvider)
     {
     	super(encoder, map, turnCostProvider);
-    	timeFactor=checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, 0.1), 0, 10);
-    	pollutionFactor=checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, 0.07), 0, 10);
+    	timeFactor=checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, 0.1));
+    	pollutionFactor=checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, 0.07));
     	smokeEnc=encoder.getDecimalEncodedValue("smoke");
     	if (timeFactor < 1e-5 && pollutionFactor < 1e-5)
             throw new IllegalArgumentException("[" + NAME + "] one of distance_factor or time_factor has to be non-zero");
     }
-    public BalancedWeighting(FlagEncoder encoder, double pollutionFactor, DecimalEncodedValue smokeEnc) {
-        this(encoder, pollutionFactor, NO_TURN_COST_PROVIDER);
-        smokeEnc=encoder.getDecimalEncodedValue("smoke");
-    }
 
-    public BalancedWeighting(FlagEncoder encoder, double pollutionFactor, TurnCostProvider turnCostProvider) {
-        super(encoder, new PMap(), turnCostProvider);
-        smokeEnc=encoder.getDecimalEncodedValue("smoke");
-        this.pollutionFactor = checkBounds(POLLUTION_FACTOR, pollutionFactor, 0, 10);
-        this.timeFactor = 0.1;
-    }
-    static double checkBounds(String key, double val, double from, double to) {
-        if (val < from || val > to)
-            throw new IllegalArgumentException(key + " has invalid range should be within [" + from + ", " + to + "]");
+    static double checkBounds(String key, double val) {
+        if (val < (double) 0 || val > (double) 10)
+            throw new IllegalArgumentException(key + " has invalid range should be within [" + (double) 0 + ", " + (double) 10 + "]");
         return val;
     }
     @Override
     public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
         double time = super.calcEdgeWeight(edgeState, reverse);
         double smoke = smokeEnc.getDecimal(reverse, edgeState.getFlags());
-        if(smoke!=0)
-            System.out.println("balanced smoke " + smoke);
-        System.out.println("balanced time " + time);
+//        if(smoke!=0)
+//            System.out.println("balanced smoke " + smoke);
+//        System.out.println("balanced time " + time);
         return (time * timeFactor) + (smoke * pollutionFactor * time);
     }
     @Override

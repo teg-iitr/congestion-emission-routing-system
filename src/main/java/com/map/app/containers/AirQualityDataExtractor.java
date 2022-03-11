@@ -1,18 +1,16 @@
 package com.map.app.containers;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.shapes.BBox;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,7 +18,6 @@ import org.json.simple.parser.JSONParser;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.Graph;
 import com.map.app.graphhopperfuncs.AirQualityBFS;
-import com.map.app.graphhopperfuncs.GreenestWeighting;
 import com.map.app.model.AirQuality;
 
 /**
@@ -30,7 +27,6 @@ import com.map.app.model.AirQuality;
 public class AirQualityDataExtractor {
 	private final JSONParser jsonP;
 	private final Lock writeLock;
-	private  ArrayList<AirQuality> ap;
 	private final GraphHopper hopper;
 	private String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
@@ -41,7 +37,7 @@ public class AirQualityDataExtractor {
 		this.writeLock = lock;
 		if (aqiApiKey ==null) {
 			Properties prop=new Properties();
-			try(FileInputStream ip = new FileInputStream("config.properties");) {
+			try(FileInputStream ip = new FileInputStream("config.properties")) {
 				prop.load(ip);
 				aqiApiKey=prop.getProperty("waqi_api_key");
 			} catch (IOException e) {
@@ -69,7 +65,7 @@ public class AirQualityDataExtractor {
 			if (responseCode != 200) {
 				throw new RuntimeException("HttpResponseCode: " + responseCode);
 			}
-			ap = new ArrayList<>();
+			ArrayList<AirQuality> ap = new ArrayList<>();
 			//avgConc=0;
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
@@ -115,6 +111,28 @@ public class AirQualityDataExtractor {
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 //			LocationIndex locationIndex = hopper.getLocationIndex();
+			// reading historical csv aqi data
+			Properties prop=new Properties();
+			try(FileInputStream ip = new FileInputStream("config.properties")) {
+				prop.load(ip);
+				String aqPath=prop.getProperty("air_quality_file");
+				BufferedReader br = new BufferedReader(new FileReader(aqPath));
+				String newLine;
+				String[] strings;
+				br.readLine();
+				while ((newLine = br.readLine()) != null) {
+					strings = newLine.split(",");
+					if (strings.length !=0) {
+						if (!Objects.equals(strings[0], "") | !Objects.equals(strings[1], "") | !Objects.equals(strings[2], "") | !Objects.equals(strings[3], ""))
+							// reads the 1/10/19_av data as aqi
+							ap.add(new AirQuality(Double.parseDouble(strings[1]), Double.parseDouble(strings[2]), Double.parseDouble(strings[3]), strings[0]));
+					}
+//					lines.add(newLine);
+				}
+				br.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Path not found");
+			}
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
 			
 				trav.start(gh.createEdgeExplorer(), 0);
