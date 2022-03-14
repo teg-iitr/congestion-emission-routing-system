@@ -49,7 +49,7 @@ public class TrafficAndRoutingService {
     	GraphHopperConfig config=new GraphHopperConfig();
     	config.putObject("index.max_region_search", 8); // increasing the search radius (a point in Rajaji forest is not able to find any road)
     	GraphHopper gh=new MyGraphHopper();
-    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1,0,true); 
+    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1,999,true);
 		gh.getEncodingManagerBuilder().add(smokeEnc);
     	//gh.c
     	Properties prop=new Properties();
