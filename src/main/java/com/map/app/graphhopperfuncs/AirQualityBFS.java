@@ -58,7 +58,8 @@ public class AirQualityBFS extends XFirstSearch {
 			for (int startNode = temp; startNode < gh.getNodes(); startNode++) {
 				EdgeIterator edgeIterator = explorer.setBaseNode(startNode);
 				while (edgeIterator.next()) {
-					EdgeIteratorState edge = gh.getEdgeIteratorState(edgeIterator.getEdge(), Integer.MIN_VALUE);
+					EdgeIteratorState edge = gh.getEdgeIteratorState(edgeIterator.getEdge(), edgeIterator.getAdjNode());
+					edgeIterator.getEdge();
 					if(edge_uni.contains(edgeIterator.getEdge()))
 					{
 						continue;
@@ -167,7 +168,7 @@ public class AirQualityBFS extends XFirstSearch {
 	private double IDW(double fromlat, double fromlon) {
 		double numer = 0;
 		double denom = 0;
-		double exp = 1;
+		double exp = 2;
 		for (AirQuality point : ap) {
 			double v = point.getAqi();
 			double d = haversine(point.getLat(), point.getLon(), fromlat, fromlon);

@@ -111,28 +111,7 @@ public class AirQualityDataExtractor {
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 //			LocationIndex locationIndex = hopper.getLocationIndex();
-			// reading historical csv aqi data
-			Properties prop=new Properties();
-			try(FileInputStream ip = new FileInputStream("config.properties")) {
-				prop.load(ip);
-				String aqPath=prop.getProperty("air_quality_file");
-				BufferedReader br = new BufferedReader(new FileReader(aqPath));
-				String newLine;
-				String[] strings;
-				br.readLine();
-				while ((newLine = br.readLine()) != null) {
-					strings = newLine.split(",");
-					if (strings.length !=0) {
-						if (!Objects.equals(strings[0], "") | !Objects.equals(strings[1], "") | !Objects.equals(strings[2], "") | !Objects.equals(strings[3], ""))
-							// reads the 1/10/19_av data as aqi
-							ap.add(new AirQuality(Double.parseDouble(strings[1]), Double.parseDouble(strings[2]), Double.parseDouble(strings[3]), strings[0]));
-					}
-//					lines.add(newLine);
-				}
-				br.close();
-			} catch (IOException e) {
-				throw new RuntimeException("Path not found");
-			}
+//			read_historical_aqi(ap);
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
 			
 				trav.start(gh.createEdgeExplorer(), 0);
@@ -148,6 +127,31 @@ public class AirQualityDataExtractor {
 		}
 
 	}
-	
+
+	private void read_historical_aqi(ArrayList<AirQuality> ap) {
+		// reading historical csv aqi data
+		Properties prop=new Properties();
+		try(FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			String aqPath=prop.getProperty("air_quality_file");
+			BufferedReader br = new BufferedReader(new FileReader(aqPath));
+			String newLine;
+			String[] strings;
+			br.readLine();
+			while ((newLine = br.readLine()) != null) {
+				strings = newLine.split(",");
+				if (strings.length !=0) {
+					if (!Objects.equals(strings[0], "") | !Objects.equals(strings[1], "") | !Objects.equals(strings[2], "") | !Objects.equals(strings[3], ""))
+						// reads the 1/10/19_av data as aqi
+						ap.add(new AirQuality(Double.parseDouble(strings[1]), Double.parseDouble(strings[2]), Double.parseDouble(strings[3]), strings[0]));
+				}
+//					lines.add(newLine);
+			}
+			br.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Path not found");
+		}
+	}
+
 
 }

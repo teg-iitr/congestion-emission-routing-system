@@ -40,6 +40,7 @@ public class RoutePathContainer {
 		request.setPathDetails(List.of(
 				Parameters.Details.EDGE_ID
 		));
+//		request.setAlgorithm(Parameters.Algorithms.ASTAR_BI);
 //		request.setAlgorithm(Parameters.Algorithms.ALT_ROUTE);
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();

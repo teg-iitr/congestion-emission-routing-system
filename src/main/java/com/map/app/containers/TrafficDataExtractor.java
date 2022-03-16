@@ -90,7 +90,7 @@ public class TrafficDataExtractor {
 					continue;
 				}
 				edgeIds.add(edgeId);
-				EdgeIteratorState edge = graph.getEdgeIteratorState(edgeId, Integer.MIN_VALUE);
+				EdgeIteratorState edge = graph.getEdgeIteratorState(edgeId, qr.getClosestEdge().getAdjNode());
 				double value;
 				switch(TrafficAndRoutingService.speedChoice){
 					case avg_actual_from_hereMaps:
