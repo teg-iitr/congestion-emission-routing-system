@@ -22,9 +22,8 @@ public class GreenestWeighting extends FastestWeighting {
 	protected GreenestWeighting(FlagEncoder encoder) {
 		this(encoder,NO_TURN_COST_PROVIDER);
 	}
-	public GreenestWeighting(FlagEncoder flagEncoder, TurnCostProvider TurnCostProvider) {
-		super(flagEncoder, TurnCostProvider);
-
+	public GreenestWeighting(FlagEncoder flagEncoder, TurnCostProvider turnCostProvider) {
+		super(flagEncoder, turnCostProvider);
 		smokeEnc=flagEncoder.getDecimalEncodedValue("smoke");
 	//    avgSpeedEnc=flagEncoder.getAverageSpeedEnc();
     }

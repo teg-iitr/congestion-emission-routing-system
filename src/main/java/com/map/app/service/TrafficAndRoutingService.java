@@ -62,21 +62,23 @@ public class TrafficAndRoutingService {
 			for (PathChoice pc : PathChoice.values()) {
 				for (TransportMode tm : TransportMode.values()) {
 					if(pc.toString().equals("all")==false)
-						profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
+						if (tm.toString().equals("foot"))
+							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
+						else
+							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setTurnCosts(true).setWeighting(pc.toString()));
 				}
 			}
 
-			profiles.add(new Profile("ipt").setVehicle("car").setWeighting("fastest"));
+			profiles.add(new Profile("ipt").setVehicle("car").setTurnCosts(true).setWeighting("fastest"));
 
 			// see https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/custom-models.md
 			CustomModel bus_custom_model = new CustomModel();
 			bus_custom_model.addToPriority(Statement.If( "road_class == RESIDENTIAL", Statement.Op.LIMIT, 0.1));
-			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car"));
+			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car").setTurnCosts(true));
 
 			CustomModel metro_custom_model = new CustomModel();
 			metro_custom_model.addToPriority(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
-			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car"));
-
+			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car").setTurnCosts(true));
 			config.setProfiles(profiles);
 			config.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
 			config.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
