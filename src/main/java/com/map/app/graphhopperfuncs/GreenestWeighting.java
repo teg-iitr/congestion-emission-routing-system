@@ -4,6 +4,7 @@ import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.routing.weighting.TurnCostProvider;
+import com.graphhopper.routing.weighting.custom.CustomWeightingHelper;
 import com.graphhopper.util.EdgeIteratorState;
 
 import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PROVIDER;
@@ -29,7 +30,7 @@ public class GreenestWeighting extends FastestWeighting {
     }
 	@Override
 	public double getMinWeight(double distance) {
-		return 0;
+		return 10;
 	}
 	@Override
 	public String getName() {
@@ -55,7 +56,7 @@ public class GreenestWeighting extends FastestWeighting {
 		//return edgeState.get(smokeEnc);
 		double smoke = smokeEnc.getDecimal(reverse, edgeState.getFlags());
 //		if(smoke!=0)
-//			 System.out.println("greenest smoke " + smoke);
+//		System.out.println("greenest smoke " + smoke);
 //		System.out.println("greenest time " + super.calcEdgeWeight(edgeState, reverse));
         return smoke * super.calcEdgeWeight(edgeState, reverse);
 	}

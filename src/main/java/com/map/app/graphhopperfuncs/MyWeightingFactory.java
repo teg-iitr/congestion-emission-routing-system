@@ -48,7 +48,7 @@ public class MyWeightingFactory implements WeightingFactory{
         if (profile.isTurnCosts() && !disableTurnCosts) {
             if (!encoder.supportsTurnCosts())
                 throw new IllegalArgumentException("Encoder " + encoder + " does not support turn costs");
-            int uTurnCosts = hints.getInt(Parameters.Routing.U_TURN_COSTS, 90);
+            int uTurnCosts = hints.getInt(Parameters.Routing.U_TURN_COSTS, INFINITE_U_TURN_COSTS);
             turnCostProvider = new DefaultTurnCostProvider(encoder, ghStorage.getTurnCostStorage(), uTurnCosts);
         } else {
             turnCostProvider = NO_TURN_COST_PROVIDER;
