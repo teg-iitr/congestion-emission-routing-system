@@ -71,7 +71,6 @@ public class AirQualityBFS extends XFirstSearch {
 					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
 					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
-					int apValue = 999;
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
 //						edge.set(smokeEnc, apValue);
 						edge.set(smokeEnc, 0);
