@@ -74,7 +74,8 @@ public class AirQualityBFS extends XFirstSearch {
 					int apValue = 999;
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
 //						edge.set(smokeEnc, apValue);
-						edge.set(smokeEnc, 0.);
+						edge.set(smokeEnc, 0);
+						edge.setReverse(smokeEnc, 0);
 						//System.out.println(smokeEnc);
 						// edge.setFl
 						count++;
@@ -82,7 +83,8 @@ public class AirQualityBFS extends XFirstSearch {
 //						if (convToConc((airQualityBase + airQualityAdj) / 2) < 0)
 //							edge.set(smokeEnc, apValue);
 //						else edge.set(smokeEnc, convToConc((airQualityBase + airQualityAdj) / 2));
-						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
+						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), 10));
+						edge.setReverse(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), 10));
 						//System.out.println(edge.get(smokeEnc));
 						count++;
 					}

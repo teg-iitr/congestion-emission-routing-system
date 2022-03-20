@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.graphhopper.json.Statement;
 
+import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.weighting.custom.CustomProfile;
 import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.shapes.BBox;
@@ -49,7 +50,7 @@ public class TrafficAndRoutingService {
     	GraphHopperConfig config=new GraphHopperConfig();
     	config.putObject("index.max_region_search", 8); // increasing the search radius (a point in Rajaji forest is not able to find any road)
     	GraphHopper gh=new MyGraphHopper();
-    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1,0,true);
+    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1,10,true);
 		gh.getEncodingManagerBuilder().add(smokeEnc);
     	//gh.c
     	Properties prop=new Properties();
