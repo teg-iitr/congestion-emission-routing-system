@@ -9,7 +9,7 @@ import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.CurvatureWeighting;
 import com.graphhopper.routing.weighting.DefaultTurnCostProvider;
-import com.graphhopper.routing.weighting.FastestWeighting;
+import com.graphhopper.routing.weighting. FastestWeighting;
 import com.graphhopper.routing.weighting.PriorityWeighting;
 import com.graphhopper.routing.weighting.ShortFastestWeighting;
 import com.graphhopper.routing.weighting.ShortestWeighting;
@@ -22,6 +22,10 @@ import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.PMap;
 import com.graphhopper.util.Parameters;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 
 //custom weighting factory with "greenest" and "balanced" option
@@ -42,13 +46,20 @@ public class MyWeightingFactory implements WeightingFactory{
         PMap hints = new PMap();
         hints.putAll(profile.getHints());
         hints.putAll(requestHints);
-
+        Properties prop=new Properties();
+        int getUTurnCosts;
+        try (FileInputStream ip = new FileInputStream("config.properties")) {
+            prop.load(ip);
+            getUTurnCosts = Integer.parseInt(prop.getProperty("u_turn_costs"));
+        } catch (IOException e) {
+            throw new RuntimeException("Config properties are not found. Aborting ...");
+        }
         FlagEncoder encoder = encodingManager.getEncoder(profile.getVehicle());
         TurnCostProvider turnCostProvider;
         if (profile.isTurnCosts() && !disableTurnCosts) {
             if (!encoder.supportsTurnCosts())
                 throw new IllegalArgumentException("Encoder " + encoder + " does not support turn costs");
-            int uTurnCosts = hints.getInt(Parameters.Routing.U_TURN_COSTS, INFINITE_U_TURN_COSTS);
+            int uTurnCosts = hints.getInt(Parameters.Routing.U_TURN_COSTS, getUTurnCosts);
             turnCostProvider = new DefaultTurnCostProvider(encoder, ghStorage.getTurnCostStorage(), uTurnCosts);
         } else {
             turnCostProvider = NO_TURN_COST_PROVIDER;
