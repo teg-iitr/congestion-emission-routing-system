@@ -1,7 +1,11 @@
 package com.map.app.graphhopperfuncs;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import com.graphhopper.GraphHopper;
@@ -47,6 +51,15 @@ public class AirQualityBFS extends XFirstSearch {
 		for (AirQuality airQuality : ap) {
 			System.out.println(airQuality);
 		}
+		int defaultSmoke;
+		Properties prop=new Properties();
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+		} catch (IOException e) {
+			throw new RuntimeException("Config properties are not found. Aborting ...");
+		}
+
 		for (TransportMode encoder : TransportMode.values()) {
 			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
 			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
@@ -82,8 +95,8 @@ public class AirQualityBFS extends XFirstSearch {
 //						if (convToConc((airQualityBase + airQualityAdj) / 2) < 0)
 //							edge.set(smokeEnc, apValue);
 //						else edge.set(smokeEnc, convToConc((airQualityBase + airQualityAdj) / 2));
-						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), 10));
-						edge.setReverse(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), 10));
+						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), defaultSmoke));
+						edge.setReverse(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), defaultSmoke));
 						//System.out.println(edge.get(smokeEnc));
 						count++;
 					}

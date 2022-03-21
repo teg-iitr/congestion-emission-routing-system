@@ -1,9 +1,10 @@
 package com.map.app.containers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -30,6 +31,7 @@ public class RoutePathContainer {
 	public RoutePathContainer(GraphHopper hopper, Lock readLock) {
 		this.gh = hopper;
 		this.readLock = readLock;
+		initializeResultsCSV();
 	}
 	
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
@@ -59,10 +61,10 @@ public class RoutePathContainer {
 			map.put("distance", (float)res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
 			
-			map.put("time", (float)(res.getTime() / (1000.))); // sec.
+			map.put("time", (float)((res.getTime()/(60))/1000)); // sec.
 						//System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
 			map.put("mean aqi",(float) (concScore)); // sec.
-			
+			map.put("exposure", (float) (concScore*((res.getTime()/(60))/1000)));
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
@@ -78,7 +80,22 @@ public class RoutePathContainer {
 			ins.add("DISTANCE IN METERS: "+res.getDistance());
 			ins.add("TIME IN MINUTES: "+((res.getTime()/(60))/1000));
 			ins.add("SUM OF CONCENTRATION SCORE: "+concScore);
-
+			ins.add("TOTAL EXPOSURE: "+(concScore*((res.getTime()/(60))/1000)));
+//			writeResults(fullRes.);
+			String origin_lat = String.valueOf(request.getPoints().get(0).lat);
+			String origin_lon = String.valueOf(request.getPoints().get(0).lon);
+			String destination_lat = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lat);
+			String destination_lon = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lon);
+			writeResults(
+					origin_lat,
+					origin_lon,
+					destination_lat,
+					destination_lon,
+					profile.split("_")[0],
+					res.getDistance(),
+					((res.getTime()/(60))/1000),
+					concScore,
+					(concScore*((res.getTime()/(60))/1000)));
 			pl = res.getPoints();
 			} 
 		finally {
@@ -139,6 +156,93 @@ public class RoutePathContainer {
 		readLock.unlock();
 		}
 		return result; //result contains latitudes and longitudes of route and instructions for navigation
+	}
+	public static void initializeResultsCSV() {
+		FileWriter csvwriter;	
+		BufferedWriter bufferedWriter = null;
+			try {
+				Properties prop=new Properties();
+				String outputDir;
+				try (FileInputStream ip = new FileInputStream("config.properties")) {
+					prop.load(ip);
+					outputDir = prop.getProperty("output_results");
+				} catch (IOException e) {
+					throw new RuntimeException("Config properties are not found. Aborting ...");
+				}
+
+				csvwriter = new FileWriter(outputDir, false);
+				bufferedWriter = new BufferedWriter(csvwriter);
+				StringJoiner stringJoiner = new StringJoiner(",");
+				stringJoiner
+						.add("origin_lat")
+						.add("origin_lon")
+						.add("destination_lat")
+						.add("destination_lon")
+						.add("routing")
+						.add("distance")
+						.add("time")
+						.add("concentration")
+						.add("exposure");
+				bufferedWriter.write(stringJoiner.toString());
+				bufferedWriter.newLine();	}
+			catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {assert bufferedWriter != null;
+				bufferedWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+				}
+				try {
+					bufferedWriter.close();
+				} catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+	}
+	public static void writeResults(String origin_lat,  String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure) {
+		FileWriter csvwriter;
+		BufferedWriter bufferedWriter = null;
+		try {
+			Properties prop=new Properties();
+			String outputDir;
+			try (FileInputStream ip = new FileInputStream("config.properties")) {
+				prop.load(ip);
+				outputDir = prop.getProperty("output_results");
+			} catch (IOException e) {
+				throw new RuntimeException("Config properties are not found. Aborting ...");
+			}
+			csvwriter = new FileWriter(outputDir, true);
+			bufferedWriter = new BufferedWriter(csvwriter);
+			StringJoiner stringJoiner = new StringJoiner(",");
+			stringJoiner
+					.add(origin_lat)
+					.add(origin_lon)
+					.add(destination_lat)
+					.add(destination_lon)
+					.add(routing)
+					.add(String.valueOf(dist))
+					.add(String.valueOf(time))
+					.add(String.valueOf(conc))
+					.add(String.valueOf(exposure));
+			bufferedWriter.write(stringJoiner.toString());
+			bufferedWriter.newLine();	}
+		catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try { assert bufferedWriter != null;
+				bufferedWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				bufferedWriter.close();
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

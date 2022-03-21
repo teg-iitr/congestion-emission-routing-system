@@ -7,6 +7,10 @@ import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.routing.weighting.custom.CustomWeightingHelper;
 import com.graphhopper.util.EdgeIteratorState;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PROVIDER;
 
 
@@ -18,7 +22,7 @@ public class GreenestWeighting extends FastestWeighting {
 	private final DecimalEncodedValue smokeEnc;
 	//final DecimalEncodedValue avgSpeedEnc;
     //private static int avgCount=0;
-	
+
 	
 	protected GreenestWeighting(FlagEncoder encoder) {
 		this(encoder,NO_TURN_COST_PROVIDER);
@@ -30,7 +34,15 @@ public class GreenestWeighting extends FastestWeighting {
     }
 	@Override
 	public double getMinWeight(double distance) {
-		return 10;
+		Properties prop=new Properties();
+		int defaultSmoke;
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+		} catch (IOException e) {
+			throw new RuntimeException("Config properties are not found. Aborting ...");
+		}
+		return defaultSmoke;
 	}
 	@Override
 	public String getName() {
@@ -54,9 +66,11 @@ public class GreenestWeighting extends FastestWeighting {
 		//return val;
 		
 		//return edgeState.get(smokeEnc);
-		double smoke = smokeEnc.getDecimal(reverse, edgeState.getFlags());
-//		if(smoke!=0)
-//		System.out.println("greenest smoke " + smoke);
+		double smoke = edgeState.get(smokeEnc);
+
+
+//		if(smoke!=defaultSmoke)
+//			System.out.println("greenest smoke " + smoke);
 //		System.out.println("greenest time " + super.calcEdgeWeight(edgeState, reverse));
         return smoke * super.calcEdgeWeight(edgeState, reverse);
 	}

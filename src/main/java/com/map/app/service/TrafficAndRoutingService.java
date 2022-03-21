@@ -50,10 +50,17 @@ public class TrafficAndRoutingService {
     	GraphHopperConfig config=new GraphHopperConfig();
     	config.putObject("index.max_region_search", 8); // increasing the search radius (a point in Rajaji forest is not able to find any road)
     	GraphHopper gh=new MyGraphHopper();
-    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1,10,true);
+		int defaultSmoke;
+		Properties prop=new Properties();
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+		} catch (IOException e) {
+			throw new RuntimeException("Config properties are not found. Aborting ...");
+		}
+    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1, defaultSmoke,true);
 		gh.getEncodingManagerBuilder().add(smokeEnc);
     	//gh.c
-    	Properties prop=new Properties();
 		try(FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			System.out.println("Using OSM file "+ prop.getProperty("datareader.file"));

@@ -51,7 +51,7 @@ public class concentrationCalc {
 			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
 			EdgeIteratorState edge = g.getEdgeIteratorState((Integer)detail.getValue(), Integer.MIN_VALUE);
 			//convToConc() System.out.println(edge.get(smokeEnc));
-			score+=smokeEnc.getDecimal(false, edge.getFlags());
+			score+=edge.get(smokeEnc);
 			}
 		
 		//System.out.println(pathDetails.size());
