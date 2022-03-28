@@ -69,25 +69,7 @@ public class TrafficDataExtractor {
 
         for (TransportMode mode : TransportMode.values()) {
             FlagEncoder encoder = hopper.getEncodingManager().getEncoder(mode.toString());
-            DecimalEncodedValue avgTimeEnc = encoder.getDecimalEncodedValue("time");
             DecimalEncodedValue avgSpeedEnc = encoder.getAverageSpeedEnc();
-            AllEdgesIterator allEdges = graph.getAllEdges();
-            EdgeIteratorState edge;
-            while (allEdges.next()) {
-                int adjNode = allEdges.getAdjNode();
-                int edgeId = allEdges.getEdge();
-                edge = graph.getEdgeIteratorState(edgeId, adjNode);
-                double time = edge.getDistance() / edge.get(avgSpeedEnc) * 3.6;
-                if ( edge.get(avgSpeedEnc) == 0 | edge.getReverse(avgSpeedEnc) == 0) {
-                    edge.set(avgTimeEnc, 9999);
-                    edge.setReverse(avgTimeEnc, 9999);
-                }
-                else {
-                    edge.set(avgTimeEnc, time);
-                    edge.setReverse(avgTimeEnc, time);
-                }
-            }
-
             LocationIndex locationIndex = hopper.getLocationIndex();
 //			int errors = 0;
 //			int updates = 0;
@@ -138,6 +120,23 @@ public class TrafficDataExtractor {
                 }
             }
 
+            DecimalEncodedValue avgTimeEnc = encoder.getDecimalEncodedValue("time");
+            AllEdgesIterator allEdges = graph.getAllEdges();
+            EdgeIteratorState edge;
+            while (allEdges.next()) {
+                int adjNode = allEdges.getAdjNode();
+                int edgeId = allEdges.getEdge();
+                edge = graph.getEdgeIteratorState(edgeId, adjNode);
+                double time = edge.getDistance() / edge.get(avgSpeedEnc) * 3.6;
+                if ( edge.get(avgSpeedEnc) == 0 | edge.getReverse(avgSpeedEnc) == 0) {
+                    edge.set(avgTimeEnc, 9999);
+                    edge.setReverse(avgTimeEnc, 9999);
+                }
+                else {
+                    edge.set(avgTimeEnc, time);
+                    edge.setReverse(avgTimeEnc, time);
+                }
+            }
         }
     }
 

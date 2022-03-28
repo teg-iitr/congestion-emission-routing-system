@@ -75,14 +75,15 @@ public class RoutePathContainer {
 			ResponsePath res = fullRes.getBest();
 			//System.out.println(res.getLegs().size());
 			//System.out.println(profile);
-			double concScore=(concentrationCalc.calcConcentrationScore(gh,res.getPathDetails().get(Parameters.Details.EDGE_ID),mode));
-			map.put("distance", (float)res.getDistance()); // m.
+			double concScore = concentrationCalc.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			double exposureScore = concentrationCalc.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			map.put("distance", (float) res.getDistance()); // m.
 						//System.out.println("Distance in meters: " + res.getDistance());
 			
-			map.put("time", (float)((res.getTime()/(60))/1000)); // sec.
+			map.put("time", (float) (res.getTime()/60)/1000); // sec.
 						//System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
-			map.put("mean aqi",(float) (concScore)); // sec.
-			map.put("exposure", (float) (concScore*((res.getTime()/(60))/1000)));
+			map.put("mean aqi",(float) concScore); // sec.
+			map.put("exposure", (float) exposureScore);
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
@@ -98,7 +99,7 @@ public class RoutePathContainer {
 			ins.add("DISTANCE IN METERS: "+res.getDistance());
 			ins.add("TIME IN MINUTES: "+((res.getTime()/(60))/1000));
 			ins.add("SUM OF CONCENTRATION SCORE: "+concScore);
-			ins.add("TOTAL EXPOSURE: "+(concScore*((res.getTime()/(60))/1000)));
+			ins.add("TOTAL EXPOSURE: "+exposureScore);
 //			writeResults(fullRes.);
 			String origin_lat = String.valueOf(request.getPoints().get(0).lat);
 			String origin_lon = String.valueOf(request.getPoints().get(0).lon);
@@ -115,7 +116,7 @@ public class RoutePathContainer {
 					res.getDistance(),
 					((res.getTime()/(60))/1000),
 					concScore,
-					(concScore*((res.getTime()/(60))/1000)),
+					exposureScore,
 					defaultSmoke,
 					defaultTime,
 					getUTurnCosts,
