@@ -48,9 +48,9 @@ public class AirQualityBFS extends XFirstSearch {
 		// System.out.println(ap);
 
 		//System.out.println(.getAllEdges());
-		for (AirQuality airQuality : ap) {
-			System.out.println(airQuality);
-		}
+//		for (AirQuality airQuality : ap) {
+//			System.out.println(airQuality);
+//		}
 		int defaultSmoke;
 		Properties prop=new Properties();
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
@@ -60,9 +60,9 @@ public class AirQualityBFS extends XFirstSearch {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
 
-		for (TransportMode encoder : TransportMode.values()) {
-			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
-			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
+		for (TransportMode mode : TransportMode.values()) {
+			FlagEncoder encoder = hopper.getEncodingManager().getEncoder(mode.toString());
+			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
 			// SimpleIntDeque fifo = new SimpleIntDeque();
 			// GHBitSet visited = createBitSet();
 			// System.out.println("KYA"+gh.getNodes());

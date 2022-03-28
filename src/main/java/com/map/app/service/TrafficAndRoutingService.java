@@ -51,15 +51,19 @@ public class TrafficAndRoutingService {
     	config.putObject("index.max_region_search", 8); // increasing the search radius (a point in Rajaji forest is not able to find any road)
     	GraphHopper gh=new MyGraphHopper();
 		int defaultSmoke;
+		int defaultTime;
 		Properties prop=new Properties();
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
-    	UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1, defaultSmoke,true);
+		UnsignedDecimalEncodedValue smokeEnc=new UnsignedDecimalEncodedValue("smoke",31,0.1, defaultSmoke,true);
+		UnsignedDecimalEncodedValue timeEnc=new UnsignedDecimalEncodedValue("time",31,0.1, defaultTime,true);
 		gh.getEncodingManagerBuilder().add(smokeEnc);
+		gh.getEncodingManagerBuilder().add(timeEnc);
     	//gh.c
 		try(FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
