@@ -78,13 +78,13 @@ public class TrafficDataExtractor {
                 int edgeId = allEdges.getEdge();
                 edge = graph.getEdgeIteratorState(edgeId, adjNode);
                 double time = edge.getDistance() / edge.get(avgSpeedEnc) * 3.6;
-                if ( edge.get(avgSpeedEnc) != 0 | edge.getReverse(avgSpeedEnc) != 0) {
-                    edge.set(avgTimeEnc, Math.min(time, 9999));
-                    edge.setReverse(avgTimeEnc, Math.min(time, 9999));
-                }
-                else {
+                if ( edge.get(avgSpeedEnc) == 0 | edge.getReverse(avgSpeedEnc) == 0) {
                     edge.set(avgTimeEnc, 9999);
                     edge.setReverse(avgTimeEnc, 9999);
+                }
+                else {
+                    edge.set(avgTimeEnc, time);
+                    edge.setReverse(avgTimeEnc, time);
                 }
             }
 
