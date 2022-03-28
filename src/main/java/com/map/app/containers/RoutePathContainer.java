@@ -27,7 +27,7 @@ import com.map.app.service.TransportMode;
 public class RoutePathContainer {
 	private final GraphHopper gh;
 	private final Lock readLock;
-
+	int c = 0;
 	public RoutePathContainer(GraphHopper hopper, Lock readLock) {
 		this.gh = hopper;
 		this.readLock = readLock;
@@ -36,17 +36,35 @@ public class RoutePathContainer {
 	
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
 	{
+		Properties prop=new Properties();
+		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor; boolean curbside;
+		String Algorithm = Parameters.Algorithms.DIJKSTRA_BI;
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+			getUTurnCosts = Integer.parseInt(prop.getProperty("u_turn_costs"));
+			getTimeFactor = Double.parseDouble(prop.getProperty("balanced_time_factor"));
+			getPollutionFactor = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
+			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
+			curbside = Boolean.getBoolean(prop.getProperty("curbside"));
+		} catch (IOException e) {
+			throw new RuntimeException("Config properties are not found. Aborting ...");
+		}
+
 		RoutePath indiv=new RoutePath();
+		List<String> CURBSIDES = new ArrayList<>(Arrays.asList("left", "left"));
 		// set routing algorithm
-		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, true);
+		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, false);
 		request.setPathDetails(List.of(
 				Parameters.Details.EDGE_ID
 		));
-//		request.setAlgorithm(Parameters.Algorithms.ASTAR_BI);
-//		request.setAlgorithm(Parameters.Algorithms.ALT_ROUTE);
+		if (curbside)
+			request.setCurbsides(CURBSIDES).putHint(Parameters.Routing.FORCE_CURBSIDE, false);
+		request.setAlgorithm(Algorithm);
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();
 		ArrayList<String> ins = new ArrayList<>();
+
 		try 
 		{//getting result
 			GHResponse fullRes = gh.route(request);
@@ -86,7 +104,9 @@ public class RoutePathContainer {
 			String origin_lon = String.valueOf(request.getPoints().get(0).lon);
 			String destination_lat = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lat);
 			String destination_lon = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lon);
+
 			writeResults(
+					c,
 					origin_lat,
 					origin_lon,
 					destination_lat,
@@ -95,13 +115,22 @@ public class RoutePathContainer {
 					res.getDistance(),
 					((res.getTime()/(60))/1000),
 					concScore,
-					(concScore*((res.getTime()/(60))/1000)));
+					(concScore*((res.getTime()/(60))/1000)),
+					defaultSmoke,
+					defaultTime,
+					getUTurnCosts,
+					getTimeFactor,
+					getPollutionFactor,
+					Algorithm,
+					curbside
+					);
 			pl = res.getPoints();
 			} 
 		finally {
 			indiv.fillPath(pl, ins);
 			indiv.setSummary(map);
 			}
+		c++;
 		return indiv;
 	}
 
@@ -174,6 +203,7 @@ public class RoutePathContainer {
 				bufferedWriter = new BufferedWriter(csvwriter);
 				StringJoiner stringJoiner = new StringJoiner(",");
 				stringJoiner
+						.add("sno")
 						.add("origin_lat")
 						.add("origin_lon")
 						.add("destination_lat")
@@ -182,7 +212,15 @@ public class RoutePathContainer {
 						.add("distance")
 						.add("time")
 						.add("concentration")
-						.add("exposure");
+						.add("exposure")
+						.add("default_smoke")
+						.add("default_time")
+						.add("u_turn_costs")
+						.add("time_factor")
+						.add("pollution_factor")
+						.add("algorithm")
+						.add("curbside");
+//						.add("request");
 				bufferedWriter.write(stringJoiner.toString());
 				bufferedWriter.newLine();	}
 			catch (IOException e) {
@@ -201,7 +239,7 @@ public class RoutePathContainer {
 				}
 			}
 	}
-	public static void writeResults(String origin_lat,  String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure) {
+	public static void writeResults(int sno, String origin_lat,  String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure, double defaultSmoke, double defaultTime, double uTurnCosts, double tFactor, double pFactor, String algorithm, Boolean curbside) {
 		FileWriter csvwriter;
 		BufferedWriter bufferedWriter = null;
 		try {
@@ -217,6 +255,7 @@ public class RoutePathContainer {
 			bufferedWriter = new BufferedWriter(csvwriter);
 			StringJoiner stringJoiner = new StringJoiner(",");
 			stringJoiner
+					.add(String.valueOf(sno))
 					.add(origin_lat)
 					.add(origin_lon)
 					.add(destination_lat)
@@ -225,7 +264,15 @@ public class RoutePathContainer {
 					.add(String.valueOf(dist))
 					.add(String.valueOf(time))
 					.add(String.valueOf(conc))
-					.add(String.valueOf(exposure));
+					.add(String.valueOf(exposure))
+					.add(String.valueOf(defaultSmoke))
+					.add(String.valueOf(defaultTime))
+					.add(String.valueOf(uTurnCosts))
+					.add(String.valueOf(tFactor))
+					.add(String.valueOf(pFactor))
+					.add(algorithm)
+					.add(String.valueOf(curbside));
+//					.add(request);
 			bufferedWriter.write(stringJoiner.toString());
 			bufferedWriter.newLine();	}
 		catch (IOException e) {
