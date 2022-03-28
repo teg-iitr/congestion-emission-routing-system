@@ -59,4 +59,22 @@ public class concentrationCalc {
 		//return score;
 		return score;
 	}
+	public static double calcExposureScore(GraphHopper gh,List<PathDetail> pathDetails,TransportMode mode)
+	{
+		double score=0;
+		Graph g=gh.getGraphHopperStorage().getBaseGraph();
+		for (PathDetail detail : pathDetails) {
+			FlagEncoder encoder = gh.getEncodingManager().getEncoder(mode.toString());
+			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
+			DecimalEncodedValue timeEnc = encoder.getDecimalEncodedValue("time");
+			EdgeIteratorState edge = g.getEdgeIteratorState((Integer)detail.getValue(), Integer.MIN_VALUE);
+			//convToConc() System.out.println(edge.get(smokeEnc));
+			score = score + edge.get(smokeEnc)*edge.get(timeEnc);
+		}
+
+		//System.out.println(pathDetails.size());
+//		System.out.println(score);
+		//return score;
+		return score;
+	}
 }
