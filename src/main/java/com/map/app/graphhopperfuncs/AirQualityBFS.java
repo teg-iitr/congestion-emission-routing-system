@@ -1,7 +1,6 @@
 package com.map.app.graphhopperfuncs;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -85,72 +84,22 @@ public class AirQualityBFS extends XFirstSearch {
 					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
-//						edge.set(smokeEnc, apValue);
-						edge.set(smokeEnc, 0);
-						edge.setReverse(smokeEnc, 0);
-						//System.out.println(smokeEnc);
-						// edge.setFl
+						edge.set(smokeEnc, defaultSmoke);
+						edge.setReverse(smokeEnc, defaultSmoke);
 						count++;
 					} else {
-//						if (convToConc((airQualityBase + airQualityAdj) / 2) < 0)
-//							edge.set(smokeEnc, apValue);
-//						else edge.set(smokeEnc, convToConc((airQualityBase + airQualityAdj) / 2));
-						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), defaultSmoke));
-						edge.setReverse(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2), defaultSmoke));
-						//System.out.println(edge.get(smokeEnc));
+						edge.set(smokeEnc, Math.max(convToConcentration((airQualityBase + airQualityAdj) / 2), defaultSmoke));
+						edge.setReverse(smokeEnc, Math.max(convToConcentration((airQualityBase + airQualityAdj) / 2), defaultSmoke));
 						count++;
 					}
 					edge_uni.add(edge.getEdge());
 				}
 			}
-			// System.out.println(visited.getCardinality());
-
-			//System.out.println("Count is " + count);
 		}
 	}
 
-	/*private int BFS(EdgeExplorer explorer, GHBitSet visited, SimpleIntDeque fifo, DecimalEncodedValue smokeEnc) {
-		int current;
-		int count = 0;
-		//System.out.println(smokeEnc.)
-		while (!fifo.isEmpty()) {
-			current = fifo.pop();
-			// if (!goFurther(current))
-			// continue;
-			EdgeIterator iter = explorer.setBaseNode(current);
-
-			while (iter.next()) {
-
-				int connectedId = iter.getAdjNode();
-				// checkAdjacent(iter) &&
-				if (!visited.contains(connectedId)) {
-					double base_lat = gh.getNodeAccess().getLat(current);
-					double base_lon = gh.getNodeAccess().getLon(current);
-					double airQualityBase = IDW(base_lat, base_lon);
-					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
-					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
-					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
-					EdgeIteratorState edge = gh.getEdgeIteratorState(iter.getEdge(), Integer.MIN_VALUE);
-
-					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
-						edge.set(smokeEnc, 0.);
-						// count++;
-					} else {
-						edge.set(smokeEnc,convToConc((airQualityBase + airQualityAdj) / 2));
-						// System.out.println(edge.get(smokeEnc));
-						// count++;
-					}
-					visited.add(connectedId);
-					fifo.push(connectedId);
-				}
-
-			}
-
-		}
-		return count;
-	}*/
-	
-	public double convToConc(double aqi)
+	// micro gm / m^3
+	public double convToConcentration(double aqi)
 	{
 		if(aqi>=0 && aqi<=50)		
 		{			return aqi*0.308;		

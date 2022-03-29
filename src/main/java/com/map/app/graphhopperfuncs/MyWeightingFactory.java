@@ -5,6 +5,7 @@ import static com.graphhopper.util.Helper.toLowerCase;
 
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.WeightingFactory;
+import com.graphhopper.routing.util.CarFlagEncoder;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.CurvatureWeighting;
