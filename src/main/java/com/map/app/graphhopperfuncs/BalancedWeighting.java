@@ -88,10 +88,10 @@ public class BalancedWeighting extends AbstractWeighting {
         double smoke = edgeState.get(smokeEnc);
         double balanced = (time * timeFactor) + (smoke * pollutionFactor * time);
 
-        System.out.println((time * timeFactor));
-        System.out.println((smoke * pollutionFactor * time));
-        System.out.println(balanced);
-        System.out.println();
+//        System.out.println((time * timeFactor));
+//        System.out.println((smoke * pollutionFactor * time));
+//        System.out.println(balanced);
+//        System.out.println();
 //        if(smoke!=0)
 //            System.out.println("balanced smoke " + smoke);
 //        System.out.println("balanced time " + time);

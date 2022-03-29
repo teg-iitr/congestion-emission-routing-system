@@ -122,19 +122,19 @@ public class TrafficDataExtractor {
 
             DecimalEncodedValue avgTimeEnc = encoder.getDecimalEncodedValue("time");
             AllEdgesIterator allEdges = graph.getAllEdges();
-            EdgeIteratorState edge;
+            EdgeIteratorState edgeIteratorState;
             while (allEdges.next()) {
                 int adjNode = allEdges.getAdjNode();
                 int edgeId = allEdges.getEdge();
-                edge = graph.getEdgeIteratorState(edgeId, adjNode);
-                double time = edge.getDistance() / edge.get(avgSpeedEnc) * 3.6;
-                if ( edge.get(avgSpeedEnc) == 0 | edge.getReverse(avgSpeedEnc) == 0) {
-                    edge.set(avgTimeEnc, 999);
-                    edge.setReverse(avgTimeEnc, 999);
+                edgeIteratorState = graph.getEdgeIteratorState(edgeId, adjNode);
+                double time = edgeIteratorState.getDistance() / edgeIteratorState.get(avgSpeedEnc) * 3.6;
+                if ( edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
+                    edgeIteratorState.set(avgTimeEnc, 999);
+                    edgeIteratorState.setReverse(avgTimeEnc, 999);
                 }
                 else {
-                    edge.set(avgTimeEnc, time);
-                    edge.setReverse(avgTimeEnc, time);
+                    edgeIteratorState.set(avgTimeEnc, time);
+                    edgeIteratorState.setReverse(avgTimeEnc, time);
                 }
             }
         }

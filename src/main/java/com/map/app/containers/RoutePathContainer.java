@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -15,7 +18,7 @@ import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 import com.map.app.model.UrlContainer;
-import com.map.app.graphhopperfuncs.concentrationCalc;
+import com.map.app.graphhopperfuncs.EncoderCalculator;
 import com.map.app.model.RoutePath;
 import com.map.app.service.PathChoice;
 import com.map.app.service.TrafficAndRoutingService;
@@ -52,7 +55,8 @@ public class RoutePathContainer {
 		}
 
 		RoutePath indiv=new RoutePath();
-		List<String> CURBSIDES = new ArrayList<>(Arrays.asList("left", "left"));
+
+		List<String> CURBSIDES = Stream.generate(() -> "left").limit(1000).collect(Collectors.toList());
 		// set routing algorithm
 		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, false);
 		request.setPathDetails(List.of(
@@ -66,23 +70,28 @@ public class RoutePathContainer {
 		ArrayList<String> ins = new ArrayList<>();
 
 		try 
-		{//getting result
+		{
 			GHResponse fullRes = gh.route(request);
 			if (fullRes.hasErrors()) 
 			{
 				throw new RuntimeException(fullRes.getErrors().toString());
 				}
 			ResponsePath res = fullRes.getBest();
-			//System.out.println(res.getLegs().size());
-			//System.out.println(profile);
-			double concScore = concentrationCalc.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-			double exposureScore = concentrationCalc.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-			map.put("distance", (float) res.getDistance()); // m.
-						//System.out.println("Distance in meters: " + res.getDistance());
-			
-			map.put("time", (float) (res.getTime()/60)/1000); // sec.
-						//System.out.println("Time in minutes: " + (res.getTime()/(60))/1000);
-			map.put("mean aqi",(float) concScore); // sec.
+			double distanceScore = (double) (Math.round(res.getDistance() / 10)) / 100;
+			double concScore = EncoderCalculator.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			double exposureScore = EncoderCalculator.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			exposureScore = (double) Math.round(exposureScore * 100) / 100;
+			double timeScore = EncoderCalculator.calcTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			timeScore = (double) (Math.round(timeScore * 10 / 60)) / 100;
+			if (profile.split("_")[0].equals("fastest") || profile.split("_")[0].equals("shortest"))
+				timeScore =  (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
+			// in metres
+			map.put("distance", (float) distanceScore);
+			// in minutes
+			map.put("time", (float) timeScore);
+			// micro gm / m^3
+			map.put("concentration", (float) concScore);
+			// micro gm s / m^3
 			map.put("exposure", (float) exposureScore);
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
@@ -96,11 +105,10 @@ public class RoutePathContainer {
 					}
 				}
 
-			ins.add("DISTANCE IN METERS: "+res.getDistance());
-			ins.add("TIME IN MINUTES: "+((res.getTime()/(60))/1000));
-			ins.add("SUM OF CONCENTRATION SCORE: "+concScore);
-			ins.add("TOTAL EXPOSURE: "+exposureScore);
-//			writeResults(fullRes.);
+			ins.add("DISTANCE [km]: " + distanceScore);
+			ins.add("TIME [min]: " + timeScore);
+			ins.add("CONCENTRATION [micro gm / m^3]: " + concScore);
+			ins.add("EXPOSURE (10^3) [micro gm sec/ m^3 ]: " + exposureScore);
 			String origin_lat = String.valueOf(request.getPoints().get(0).lat);
 			String origin_lon = String.valueOf(request.getPoints().get(0).lon);
 			String destination_lat = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lat);
@@ -113,8 +121,8 @@ public class RoutePathContainer {
 					destination_lat,
 					destination_lon,
 					profile.split("_")[0],
-					res.getDistance(),
-					((res.getTime()/(60))/1000),
+					distanceScore,
+					timeScore,
 					concScore,
 					exposureScore,
 					defaultSmoke,

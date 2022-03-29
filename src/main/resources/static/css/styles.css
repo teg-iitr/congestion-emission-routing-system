@@ -44,7 +44,6 @@ body,html {
 }
 .inputbox
 {
-	
 	background-color: #007D98;
 	width: 25%;
 	height:100%;
@@ -53,6 +52,8 @@ body,html {
 	color:#FFFFFF;
     font-size:15px;	
     display: inline-block;
+    padding-top: 100px;
+    padding-bottom: 300px;
 }
 .CollapseOps
 {
@@ -60,13 +61,17 @@ body,html {
 }
 .inputboxcontainer
 {
-	position: relative;
+position: relative;
 text-align: center;
-padding: 2.5%;		
+padding: 5%;
 }
 .optiongrp
 {
-	display: flex;  flex-grow: 1; flex-direction: column; justify-content: center;  align-items: center; 
+display: flex;
+flex-grow: 1;
+flex-direction: column;
+justify-content: center;
+align-items: center;
 }
 .options
 {
@@ -80,10 +85,10 @@ background-color: greenyellow;
 }
 #mapid
 {
-	width: 75%;
-	height: 100%;
-	float:left;
-	z-index: 1;
+width: 75%;
+height: 100%;
+float:left;
+z-index: 1;
 }
 #car_label
 {
