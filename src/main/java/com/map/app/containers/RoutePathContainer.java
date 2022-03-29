@@ -87,12 +87,12 @@ public class RoutePathContainer {
 			InstructionList list = res.getInstructions();
 			for (Instruction ele: list) {
 				if (ele.getSign() != 4) {
-					String navIns = ele.getTurnDescription(list.getTr()) + ", covering about " + (Math.round(ele.getDistance() * 100) / 100) + " meters";
+					String navIns = ele.getTurnDescription(list.getTr()) + ", covering about " + (double) (Math.round(ele.getDistance() * 100) / 100) + " meters";
 					ins.add(navIns.toLowerCase());
 					} 
 				else {
 					String navIns = ele.getTurnDescription(list.getTr());
-					ins.add(navIns);
+					ins.add(navIns.toLowerCase());
 					}
 				}
 
@@ -164,9 +164,9 @@ public class RoutePathContainer {
 				break;
 		}
 
-		if(profile.length()!=0)
+		if(profile.length() != 0)
 		{
-			result.add(finalPath(p,profile,mode));
+			result.add(finalPath(p, profile, mode));
 		}
 		else 
 		{
@@ -176,7 +176,7 @@ public class RoutePathContainer {
 				{
 					
 					profile = TrafficAndRoutingService.getModeBasedPathChoice(pc, mode);
-					result.add(finalPath(p,profile,mode));
+					result.add(finalPath(p, profile, mode));
 				}
 			}
 		}

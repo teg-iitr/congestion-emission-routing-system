@@ -44,12 +44,12 @@ public class BalancedWeighting extends AbstractWeighting {
         double getTimeFactor, getPollutionFactor;
         try (FileInputStream ip = new FileInputStream("config.properties")) {
             prop.load(ip);
-            getTimeFactor = Double.parseDouble(prop.getProperty("balanced_time_factor")) * 200;
+            getTimeFactor = Double.parseDouble(prop.getProperty("balanced_time_factor"));
             getPollutionFactor = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
         } catch (IOException e) {
             throw new RuntimeException("Config properties are not found. Aborting ...");
         }
-        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor), 0.0D, 200D);
+        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor), 0.0D, 1D);
         this.pollutionFactor = checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, getPollutionFactor), 0.0D, 1D);
         smokeEnc=encoder.getDecimalEncodedValue("smoke");
         timeEnc=encoder.getDecimalEncodedValue("time");
@@ -88,10 +88,10 @@ public class BalancedWeighting extends AbstractWeighting {
         double smoke = edgeState.get(smokeEnc);
         double balanced = (time * timeFactor) + (smoke * pollutionFactor * time);
 
-//        System.out.println((time * timeFactor));
-//        System.out.println((smoke * pollutionFactor * time));
-//        System.out.println(balanced);
-//        System.out.println();
+        System.out.println((time * timeFactor));
+        System.out.println((smoke * pollutionFactor * time));
+        System.out.println(balanced);
+        System.out.println();
 //        if(smoke!=0)
 //            System.out.println("balanced smoke " + smoke);
 //        System.out.println("balanced time " + time);
