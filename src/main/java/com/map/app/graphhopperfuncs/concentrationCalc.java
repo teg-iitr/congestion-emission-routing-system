@@ -75,6 +75,6 @@ public class concentrationCalc {
 		//System.out.println(pathDetails.size());
 //		System.out.println(score);
 		//return score;
-		return score;
+		return score / Math.pow(10, 3);
 	}
 }

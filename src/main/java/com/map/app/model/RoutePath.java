@@ -61,8 +61,8 @@ public class RoutePath {
 		}
 	public void fillPath(PointList rp, ArrayList<String> ins) {
 		
-		for (int i = 0; i<rp.size(); i++) {
-			points.add(new GHPoint(rp.getLat(i),rp.getLon(i)));
+		for (int i = 0; i < rp.size(); i++) {
+			points.add(new GHPoint(rp.getLat(i), rp.getLon(i)));
 		}
 		BBox routeBB=calcBBox2D(rp);
 		bounds.add(routeBB.minLat);
