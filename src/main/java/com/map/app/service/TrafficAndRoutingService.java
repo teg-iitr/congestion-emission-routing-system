@@ -52,11 +52,13 @@ public class TrafficAndRoutingService {
     	GraphHopper gh=new MyGraphHopper();
 		int defaultSmoke;
 		int defaultTime;
+		boolean turnCosts;
 		Properties prop=new Properties();
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
 			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
+			turnCosts = Boolean.getBoolean("turn_costs");
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
@@ -77,20 +79,20 @@ public class TrafficAndRoutingService {
 						if (tm.toString().equals("foot"))
 							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
 						else
-							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setTurnCosts(true).setWeighting(pc.toString()));
+							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setTurnCosts(turnCosts).setWeighting(pc.toString()));
 				}
 			}
 
-			profiles.add(new Profile("ipt").setVehicle("car").setTurnCosts(true).setWeighting("fastest"));
+			profiles.add(new Profile("ipt").setVehicle("car").setTurnCosts(turnCosts).setWeighting("fastest"));
 
 			// see https://github.com/graphhopper/graphhopper/blob/4.x/docs/core/custom-models.md
 			CustomModel bus_custom_model = new CustomModel();
 			bus_custom_model.addToPriority(Statement.If( "road_class == RESIDENTIAL", Statement.Op.LIMIT, 0.1));
-			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car").setTurnCosts(true));
+			profiles.add(new CustomProfile("bus").setCustomModel(bus_custom_model).setVehicle("car").setTurnCosts(turnCosts));
 
 			CustomModel metro_custom_model = new CustomModel();
 			metro_custom_model.addToPriority(Statement.If( "road_class != TRUNK", Statement.Op.LIMIT, 0.1));
-			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car").setTurnCosts(true));
+			profiles.add(new CustomProfile("metro").setCustomModel(metro_custom_model).setVehicle("car").setTurnCosts(turnCosts));
 			config.setProfiles(profiles);
 			config.putObject("graph.flag_encoders",prop.getProperty("graph.flag_encoders"));
 			config.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
@@ -123,7 +125,7 @@ public class TrafficAndRoutingService {
 		ArrayList<Float> box=new ArrayList<>();
 		box.add((float)boundingBox.minLat);
 		box.add((float)boundingBox.minLon);
-		box.add((float) boundingBox.maxLat);
+		box.add((float)boundingBox.maxLat);
 		box.add((float)boundingBox.maxLon);
 		
 		return box;
