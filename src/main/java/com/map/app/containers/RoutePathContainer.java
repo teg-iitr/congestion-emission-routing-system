@@ -40,28 +40,31 @@ public class RoutePathContainer {
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
 	{
 		Properties prop=new Properties();
-		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor; boolean curbside;
+		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor; boolean curbside, getPassThrough;
 		String Algorithm = Parameters.Algorithms.DIJKSTRA_BI;
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+			getPassThrough = Boolean.parseBoolean(prop.getProperty("pass_through"));
 			getUTurnCosts = Integer.parseInt(prop.getProperty("u_turn_costs"));
 			getTimeFactor = Double.parseDouble(prop.getProperty("balanced_time_factor"));
 			getPollutionFactor = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
 			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
-			curbside = Boolean.getBoolean(prop.getProperty("curbside"));
+			curbside = Boolean.parseBoolean(prop.getProperty("curbside"));
+			System.out.println(curbside);
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
 
 		RoutePath indiv=new RoutePath();
-
 		List<String> CURBSIDES = Stream.generate(() -> "left").limit(1000).collect(Collectors.toList());
 		// set routing algorithm
-		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon()).setProfile(profile).putHint(Parameters.CH.DISABLE, false);
-		request.setPathDetails(List.of(
-				Parameters.Details.EDGE_ID
-		));
+		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon())
+				.setProfile(profile)
+				.putHint(Parameters.CH.DISABLE, false)
+				.putHint(Parameters.Routing.U_TURN_COSTS, getUTurnCosts)
+				.putHint(Parameters.Routing.PASS_THROUGH, getPassThrough)
+				.setPathDetails(List.of(Parameters.Details.EDGE_ID));
 		if (curbside)
 			request.setCurbsides(CURBSIDES).putHint(Parameters.Routing.FORCE_CURBSIDE, false);
 		request.setAlgorithm(Algorithm);
