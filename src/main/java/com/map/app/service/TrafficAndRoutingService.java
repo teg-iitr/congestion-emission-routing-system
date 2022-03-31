@@ -58,7 +58,7 @@ public class TrafficAndRoutingService {
 			prop.load(ip);
 			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
 			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
-			turnCosts = Boolean.getBoolean("turn_costs");
+			turnCosts = Boolean.parseBoolean(prop.getProperty("turn_costs"));
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
@@ -75,7 +75,7 @@ public class TrafficAndRoutingService {
 
 			for (PathChoice pc : PathChoice.values()) {
 				for (TransportMode tm : TransportMode.values()) {
-					if(pc.toString().equals("all")==false)
+					if(!pc.toString().equals("all"))
 						if (tm.toString().equals("foot"))
 							profiles.add(new Profile(TrafficAndRoutingService.getModeBasedPathChoice(pc, tm)).setVehicle(tm.toString()).setWeighting(pc.toString()));
 						else

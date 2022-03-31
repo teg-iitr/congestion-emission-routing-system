@@ -49,8 +49,8 @@ public class BalancedWeighting extends AbstractWeighting {
         } catch (IOException e) {
             throw new RuntimeException("Config properties are not found. Aborting ...");
         }
-        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor), 0.0D, 100D);
-        this.pollutionFactor = checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, getPollutionFactor), 0.0D, 100D);
+        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor*10), 0.0D, 100D);
+        this.pollutionFactor = checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, getPollutionFactor/10), 0.0D, 100D);
         smokeEnc=encoder.getDecimalEncodedValue("smoke");
         timeEnc=encoder.getDecimalEncodedValue("time");
         if (timeFactor < 1e-5 && pollutionFactor < 1e-5)
