@@ -66,7 +66,6 @@ public class BalancedWeighting extends FastestWeighting {
         }
     }
 
-
     @Override
     public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
         double smoke = edgeState.get(smokeEnc);
