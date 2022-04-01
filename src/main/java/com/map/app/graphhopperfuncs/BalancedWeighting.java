@@ -19,7 +19,7 @@ import static com.graphhopper.routing.weighting.TurnCostProvider.NO_TURN_COST_PR
  *
  * @author Siftee
  */
-public class BalancedWeighting extends AbstractWeighting {
+public class BalancedWeighting extends FastestWeighting {
     private static final String NAME="balanced";
     private static final String TIME_FACTOR="balanced.time_factor";
     private static final String POLLUTION_FACTOR="balanced.pollution_factor";
@@ -49,8 +49,10 @@ public class BalancedWeighting extends AbstractWeighting {
         } catch (IOException e) {
             throw new RuntimeException("Config properties are not found. Aborting ...");
         }
-        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor*10), 0.0D, 100D);
-        this.pollutionFactor = checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, getPollutionFactor/10), 0.0D, 100D);
+        getTimeFactor = getTimeFactor / (getTimeFactor + getPollutionFactor);
+        getPollutionFactor = 1 - getTimeFactor;
+        this.timeFactor = checkBounds(TIME_FACTOR, map.getDouble(TIME_FACTOR, getTimeFactor), 0.0D, 1D);
+        this.pollutionFactor = checkBounds(POLLUTION_FACTOR, map.getDouble(POLLUTION_FACTOR, getPollutionFactor), 0.0D, 1D);
         smokeEnc=encoder.getDecimalEncodedValue("smoke");
         timeEnc=encoder.getDecimalEncodedValue("time");
         if (timeFactor < 1e-5 && pollutionFactor < 1e-5)
@@ -64,42 +66,30 @@ public class BalancedWeighting extends AbstractWeighting {
         }
     }
 
-    //    public BalancedWeighting(FlagEncoder encoder, double distanceFactor, TurnCostProvider turnCostProvider) {
-//        super(encoder, new PMap(), turnCostProvider);
-//        this.pollutionFactor = 0.5;
-//        this.timeFactor = 20;
-//    }
-    @Override
-    public double getMinWeight(double distance) {
-        Properties prop = new Properties();
-        int defaultSmoke;
-        try (FileInputStream ip = new FileInputStream("config.properties")) {
-            prop.load(ip);
-            defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
-        } catch (IOException e) {
-            throw new RuntimeException("Config properties are not found. Aborting ...");
-        }
-        return defaultSmoke;
-    }
 
     @Override
     public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
-        double time = edgeState.get(timeEnc);
         double smoke = edgeState.get(smokeEnc);
-        double balanced = (time * timeFactor) + (smoke * pollutionFactor * time);
-
-//        System.out.println((time * timeFactor));
-//        System.out.println((smoke * pollutionFactor * time));
-//        System.out.println(balanced);
-//        System.out.println();
-//        if(smoke!=0)
-//            System.out.println("balanced smoke " + smoke);
-//        System.out.println("balanced time " + time);
-        return balanced;
+        double timeG = edgeState.get(timeEnc);
+        double timeT = super.calcEdgeWeight(edgeState, reverse);
+        int power10 = countDigit((long) (smoke * pollutionFactor * timeG));
+        double fastestWeight = timeFactor * timeT * Math.pow(10, power10);
+        double greenestWeight = smoke * pollutionFactor * timeG;
+        return fastestWeight + greenestWeight;
     }
 
     @Override
     public String getName() {
         return NAME;
+    }
+
+    static int countDigit(long n)
+    {
+        int count = 0;
+        while (n != 0) {
+            n = n / 10;
+            ++count;
+        }
+        return count - 1;
     }
 }

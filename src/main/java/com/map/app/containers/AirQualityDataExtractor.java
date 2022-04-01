@@ -111,7 +111,7 @@ public class AirQualityDataExtractor {
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 //			LocationIndex locationIndex = hopper.getLocationIndex();
-			read_historical_aqi(ap);
+//			read_historical_aqi(ap);
 			AirQualityBFS trav = new AirQualityBFS(hopper, gh, ap);
 			
 				trav.start(gh.createEdgeExplorer(), 0);

@@ -1,11 +1,9 @@
 package com.map.app.containers;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -108,18 +106,15 @@ public class TrafficDataExtractor {
                             value = Math.min(entrySpeed.get(0), entrySpeed.get(1));
                             break;
                     }
-
-
                     double oldValue = edgeIteratorState.get(avgSpeedEnc);
-                    if (value != oldValue) {
-//					updates++;
-                        //System.out.println(avgSpeedEnc.getMaxDecimal());
-                        edgeIteratorState.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
-                    }
 
+                    if (value != oldValue)
+                        edgeIteratorState.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
+                    if (edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
+                        edgeIteratorState.set(avgSpeedEnc, avgSpeedEnc.getMaxDecimal());
+                    }
                 }
             }
-
             DecimalEncodedValue avgTimeEnc = encoder.getDecimalEncodedValue("time");
             AllEdgesIterator allEdges = graph.getAllEdges();
             EdgeIteratorState edgeIteratorState;
@@ -127,14 +122,19 @@ public class TrafficDataExtractor {
                 int adjNode = allEdges.getAdjNode();
                 int edgeId = allEdges.getEdge();
                 edgeIteratorState = graph.getEdgeIteratorState(edgeId, adjNode);
-                double time = edgeIteratorState.getDistance() / edgeIteratorState.get(avgSpeedEnc) * 3.6;
-                if ( edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
-                    edgeIteratorState.set(avgTimeEnc, 999);
-                    edgeIteratorState.setReverse(avgTimeEnc, 999);
-                }
-                else {
+                double time = edgeIteratorState.getDistance() / (edgeIteratorState.get(avgSpeedEnc) * 3.6);
+                double timeR = edgeIteratorState.getDistance() / (edgeIteratorState.get(avgSpeedEnc) * 3.6);
+                if (edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
+                    // setting to a very high value of time
+                    time = 999999;
+                    timeR = 999999;
+                    time =  edgeIteratorState.getDistance() / (avgSpeedEnc.getMaxDecimal() * 3.6);
+                    timeR = time;
                     edgeIteratorState.set(avgTimeEnc, time);
-                    edgeIteratorState.setReverse(avgTimeEnc, time);
+                    edgeIteratorState.setReverse(avgTimeEnc, timeR);
+                } else {
+                    edgeIteratorState.set(avgTimeEnc, time);
+                    edgeIteratorState.setReverse(avgTimeEnc, timeR);
                 }
             }
         }
