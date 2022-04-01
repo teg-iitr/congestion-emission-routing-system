@@ -130,7 +130,7 @@ public class RoutePathContainer {
 			String origin_lon = String.valueOf(ghRequest.getPoints().get(0).lon);
 			String destination_lat = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() -1).lat);
 			String destination_lon = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() -1).lon);
-			String timeStamp = new SimpleDateFormat("yyyy:MM:dd_HH:mm:ss").format(Calendar.getInstance().getTime());
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyyHH:mm:ss").format(Calendar.getInstance().getTime());
 			writeResults(
 					c,
 					origin_lat,

@@ -55,7 +55,7 @@ public class ScoreCalculator extends FastestWeighting{
 		}
 		return (double) Math.round(score * 100 / 60) / 100;
 	}
-	public double calcFastestShortestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
+	/*public double calcFastestShortestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
 	{
 		double score = 0;
 		Graph g=gh.getGraphHopperStorage().getBaseGraph();
@@ -78,5 +78,5 @@ public class ScoreCalculator extends FastestWeighting{
 			score = score + (timeG * pollutionFactor) + (timeF * timeFactor);
 		}
 		return (double) Math.round(score * 100 / 60) / 100;
-	}
+	}*/
 }

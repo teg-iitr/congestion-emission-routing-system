@@ -107,7 +107,6 @@ public class TrafficDataExtractor {
                             break;
                     }
                     double oldValue = edgeIteratorState.get(avgSpeedEnc);
-
                     if (value != oldValue)
                         edgeIteratorState.set(avgSpeedEnc, Math.min(value, avgSpeedEnc.getMaxDecimal()));
                     if (edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
