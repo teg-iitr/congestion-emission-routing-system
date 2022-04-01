@@ -42,7 +42,7 @@ public class TrafficAndRoutingService {
 	private final BBox boundingBox;
 	// a few settings for here maps real-time congestion data
 	public enum SpeedChoice{avg_actual_from_hereMaps, free_flow_from_hereMaps, lower_of_two}
-	public static SpeedChoice speedChoice = SpeedChoice.avg_actual_from_hereMaps;
+	public static SpeedChoice speedChoice = SpeedChoice.lower_of_two;
 	public static float functional_road_class_here_maps = 4.0f;
 
 	public TrafficAndRoutingService() {
@@ -107,7 +107,6 @@ public class TrafficAndRoutingService {
     	//System.out.println(gh.getEncodingManager().getDecimalEncodedValue("smoke"));
     	gh.clean();   	
     	gh.importOrLoad();
-    	
     	//gh.set
     	this.boundingBox = gh.getGraphHopperStorage().getBaseGraph().getBounds();
     	dt = new TrafficDataExtractor(gh,lock.writeLock());

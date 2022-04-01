@@ -56,27 +56,8 @@ public class GreenestWeighting extends AbstractWeighting {
 
 	@Override
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
-		//System.out.println(edgeState.)
-		//	if(edgeState.get(smokeEnc)==0)
-		//{
-		//count++;
-		//	System.out.println(count);
-		//}
-		//return edgeState.get(smokeEnc);
-		//double val=AirQualityDataExtractor.assignWeight(edgeState);
-		//System.out.println(val);
-		//edgeState.set(smokeEnc,val);
-		//System.out.println(edgeState.get(smokeEnc));
-		//return val;
-
-		//return edgeState.get(smokeEnc);
 		double smoke = edgeState.get(smokeEnc);
 		double time = edgeState.get(timeEnc);
-
-//		System.out.println(time);
-//		if(smoke!=defaultSmoke)
-//			System.out.println("greenest smoke " + smoke);
-//		System.out.println("greenest time " + super.calcEdgeWeight(edgeState, reverse));
 		return time * smoke;
 	}
 

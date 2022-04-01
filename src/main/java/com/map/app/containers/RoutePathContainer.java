@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
@@ -13,12 +14,13 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
+import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 import com.map.app.model.UrlContainer;
-import com.map.app.graphhopperfuncs.EncoderCalculator;
+import com.map.app.graphhopperfuncs.ScoreCalculator;
 import com.map.app.model.RoutePath;
 import com.map.app.service.PathChoice;
 import com.map.app.service.TrafficAndRoutingService;
@@ -40,7 +42,7 @@ public class RoutePathContainer {
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
 	{
 		Properties prop=new Properties();
-		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor; boolean curbside, getPassThrough;
+		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor, sum; boolean curbside, getPassThrough;
 		String Algorithm = Parameters.Algorithms.DIJKSTRA_BI;
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
@@ -51,43 +53,55 @@ public class RoutePathContainer {
 			getPollutionFactor = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
 			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
 			curbside = Boolean.parseBoolean(prop.getProperty("curbside"));
+			sum = getTimeFactor + getPollutionFactor;
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
-
-		RoutePath indiv=new RoutePath();
+		getTimeFactor = getTimeFactor / sum;
+		getPollutionFactor = 1 - getTimeFactor;
+		RoutePath routePath=new RoutePath();
 		List<String> CURBSIDES = Stream.generate(() -> "left").limit(2).collect(Collectors.toList());
 		// set routing algorithm
-		GHRequest request=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon())
+		GHRequest ghRequest=new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon())
 				.setProfile(profile)
 				.putHint(Parameters.CH.DISABLE, true)
 				.putHint(Parameters.Routing.U_TURN_COSTS, getUTurnCosts)
 				.putHint(Parameters.Routing.PASS_THROUGH, getPassThrough)
 				.setPathDetails(List.of(Parameters.Details.EDGE_ID));
 		if (curbside) {
-			request.setCurbsides(CURBSIDES).putHint(Parameters.Routing.FORCE_CURBSIDE, false);
+			ghRequest.setCurbsides(CURBSIDES).putHint(Parameters.Routing.FORCE_CURBSIDE, false);
 		}
-		request.setAlgorithm(Algorithm);
+		ghRequest.setAlgorithm(Algorithm);
 		PointList pl = new PointList();
 		HashMap<String,Float> map=new HashMap<>();
 		ArrayList<String> ins = new ArrayList<>();
 
 		try 
 		{
-			GHResponse fullRes = gh.route(request);
+			GHResponse fullRes = gh.route(ghRequest);
 			if (fullRes.hasErrors()) 
 			{
 				throw new RuntimeException(fullRes.getErrors().toString());
 				}
 			ResponsePath res = fullRes.getBest();
+			FlagEncoder encoder = gh.getEncodingManager().getEncoder(mode.toString());
+			ScoreCalculator scoreCalculator = new ScoreCalculator(encoder);
+			// to get distance in km (upto 2 decimal places)
 			double distanceScore = (double) (Math.round(res.getDistance() / 10)) / 100;
-			double concScore = EncoderCalculator.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-			double exposureScore = EncoderCalculator.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			double concScore = ScoreCalculator.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			double exposureScore = ScoreCalculator.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			// upto 2 decimal places
 			exposureScore = (double) Math.round(exposureScore * 100) / 100;
-			double timeScore = EncoderCalculator.calcTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-			timeScore = (double) (Math.round(timeScore * 10 / 60)) / 100;
-			if (profile.split("_")[0].equals("fastest") || profile.split("_")[0].equals("shortest"))
-				timeScore =  (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
+			double timeScore;
+//			if (profile.split("_")[0].equals("fastest") || profile.split("_")[0].equals("shortest")) {
+//				timeScore = (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
+//				timeScore = scoreCalculator.calcFastestShortestTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+//			}
+//			else if (profile.split("_")[0].equals("balanced"))
+//				timeScore = scoreCalculator.calcBalancedTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode, getTimeFactor, getPollutionFactor);
+//			else
+//				timeScore = ScoreCalculator.calcGreenestTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
+			timeScore = (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
 			// in metres
 			map.put("distance", (float) distanceScore);
 			// in minutes
@@ -112,11 +126,11 @@ public class RoutePathContainer {
 			ins.add("TIME [min]: " + timeScore);
 			ins.add("CONCENTRATION [micro gm / m^3]: " + concScore);
 			ins.add("EXPOSURE (10^3) [micro gm sec/ m^3 ]: " + exposureScore);
-			String origin_lat = String.valueOf(request.getPoints().get(0).lat);
-			String origin_lon = String.valueOf(request.getPoints().get(0).lon);
-			String destination_lat = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lat);
-			String destination_lon = String.valueOf(request.getPoints().get(request.getPoints().size() -1).lon);
-
+			String origin_lat = String.valueOf(ghRequest.getPoints().get(0).lat);
+			String origin_lon = String.valueOf(ghRequest.getPoints().get(0).lon);
+			String destination_lat = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() -1).lat);
+			String destination_lon = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() -1).lon);
+			String timeStamp = new SimpleDateFormat("yyyy:MM:dd_HH:mm:ss").format(Calendar.getInstance().getTime());
 			writeResults(
 					c,
 					origin_lat,
@@ -134,16 +148,17 @@ public class RoutePathContainer {
 					getTimeFactor,
 					getPollutionFactor,
 					Algorithm,
-					curbside
+					curbside,
+					timeStamp
 					);
 			pl = res.getPoints();
 			} 
 		finally {
-			indiv.fillPath(pl, ins);
-			indiv.setSummary(map);
+			routePath.fillPath(pl, ins);
+			routePath.setSummary(map);
 			}
 		c++;
-		return indiv;
+		return routePath;
 	}
 
 	public ArrayList<RoutePath> find(UrlContainer p) {
@@ -231,7 +246,8 @@ public class RoutePathContainer {
 						.add("time_factor")
 						.add("pollution_factor")
 						.add("algorithm")
-						.add("curbside");
+						.add("curbside")
+						.add("timestamp");
 //						.add("request");
 				bufferedWriter.write(stringJoiner.toString());
 				bufferedWriter.newLine();	}
@@ -251,7 +267,7 @@ public class RoutePathContainer {
 				}
 			}
 	}
-	public static void writeResults(int sno, String origin_lat,  String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure, double defaultSmoke, double defaultTime, double uTurnCosts, double tFactor, double pFactor, String algorithm, Boolean curbside) {
+	public static void writeResults(int sno, String origin_lat,  String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure, double defaultSmoke, double defaultTime, double uTurnCosts, double tFactor, double pFactor, String algorithm, Boolean curbside, String timeStamp) {
 		FileWriter csvwriter;
 		BufferedWriter bufferedWriter = null;
 		try {
@@ -283,7 +299,8 @@ public class RoutePathContainer {
 					.add(String.valueOf(tFactor))
 					.add(String.valueOf(pFactor))
 					.add(algorithm)
-					.add(String.valueOf(curbside));
+					.add(String.valueOf(curbside))
+					.add(timeStamp);
 //					.add(request);
 			bufferedWriter.write(stringJoiner.toString());
 			bufferedWriter.newLine();	}
