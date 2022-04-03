@@ -71,7 +71,9 @@ public class BalancedWeighting extends FastestWeighting {
         double smoke = edgeState.get(smokeEnc);
         double timeG = edgeState.get(timeEnc);
         double timeT = super.calcEdgeWeight(edgeState, reverse);
+        // the magnitude of (smoke * pollutionFactor * timeG) is very high compared to (timeFactor * timeT)
         int power10 = countDigit((long) (smoke * pollutionFactor * timeG));
+        // makes (timeFactor * timeT) in the same range by multiplying with 10^(number of digits)
         double fastestWeight = timeFactor * timeT * Math.pow(10, power10);
         double greenestWeight = smoke * pollutionFactor * timeG;
         return fastestWeight + greenestWeight;
@@ -82,6 +84,7 @@ public class BalancedWeighting extends FastestWeighting {
         return NAME;
     }
 
+    // to make the magnitude (range) of a number similar to another number.
     static int countDigit(long n)
     {
         int count = 0;

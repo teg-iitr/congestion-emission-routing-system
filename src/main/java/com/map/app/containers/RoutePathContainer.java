@@ -42,7 +42,7 @@ public class RoutePathContainer {
 	public RoutePath finalPath(UrlContainer p,String profile,TransportMode mode)
 	{
 		Properties prop=new Properties();
-		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor, sum; boolean curbside, getPassThrough;
+		int getUTurnCosts, defaultSmoke, defaultTime; double getTimeFactor, getPollutionFactor, sumFactors; boolean curbside, getPassThrough;
 		String Algorithm = Parameters.Algorithms.DIJKSTRA_BI;
 		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
@@ -53,11 +53,11 @@ public class RoutePathContainer {
 			getPollutionFactor = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
 			defaultTime = Integer.parseInt(prop.getProperty("default_time"));
 			curbside = Boolean.parseBoolean(prop.getProperty("curbside"));
-			sum = getTimeFactor + getPollutionFactor;
+			sumFactors = getTimeFactor + getPollutionFactor;
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
-		getTimeFactor = getTimeFactor / sum;
+		getTimeFactor = getTimeFactor / sumFactors;
 		getPollutionFactor = 1 - getTimeFactor;
 		RoutePath routePath=new RoutePath();
 		List<String> CURBSIDES = Stream.generate(() -> "left").limit(2).collect(Collectors.toList());
@@ -68,7 +68,8 @@ public class RoutePathContainer {
 				.putHint(Parameters.Routing.U_TURN_COSTS, getUTurnCosts)
 				.putHint(Parameters.Routing.PASS_THROUGH, getPassThrough)
 				.setPathDetails(List.of(Parameters.Details.EDGE_ID));
-		if (curbside) {
+		// always false for foot mode
+		if (curbside & !mode.toString().equals("foot")) {
 			ghRequest.setCurbsides(CURBSIDES).putHint(Parameters.Routing.FORCE_CURBSIDE, false);
 		}
 		ghRequest.setAlgorithm(Algorithm);
@@ -90,17 +91,9 @@ public class RoutePathContainer {
 			double distanceScore = (double) (Math.round(res.getDistance() / 10)) / 100;
 			double concScore = ScoreCalculator.calcConcentrationScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
 			double exposureScore = ScoreCalculator.calcExposureScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-			// upto 2 decimal places
+			// exposure upto 2 decimal places
 			exposureScore = (double) Math.round(exposureScore * 100) / 100;
 			double timeScore;
-//			if (profile.split("_")[0].equals("fastest") || profile.split("_")[0].equals("shortest")) {
-//				timeScore = (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
-//				timeScore = scoreCalculator.calcFastestShortestTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
-//			}
-//			else if (profile.split("_")[0].equals("balanced"))
-//				timeScore = scoreCalculator.calcBalancedTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode, getTimeFactor, getPollutionFactor);
-//			else
-//				timeScore = ScoreCalculator.calcGreenestTimeScore(gh, res.getPathDetails().get(Parameters.Details.EDGE_ID), mode);
 			timeScore = (double) (Math.round((double) ((res.getTime() * 100 / 60) / 1000))) / 100;
 			// in metres
 			map.put("distance", (float) distanceScore);
@@ -213,6 +206,7 @@ public class RoutePathContainer {
 		}
 		return result; //result contains latitudes and longitudes of route and instructions for navigation
 	}
+
 	public static void initializeResultsCSV() {
 		FileWriter csvwriter;	
 		BufferedWriter bufferedWriter = null;
