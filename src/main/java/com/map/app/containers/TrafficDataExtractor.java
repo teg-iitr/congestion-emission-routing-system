@@ -124,9 +124,7 @@ public class TrafficDataExtractor {
                 double time = edgeIteratorState.getDistance() / (edgeIteratorState.get(avgSpeedEnc) * 3.6);
                 double timeR = edgeIteratorState.getDistance() / (edgeIteratorState.get(avgSpeedEnc) * 3.6);
                 if (edgeIteratorState.get(avgSpeedEnc) == 0 | edgeIteratorState.getReverse(avgSpeedEnc) == 0) {
-                    // setting to a very high value of time
-                    time = 999999;
-                    timeR = 999999;
+                    // setting time to free flow time as speed = 0 could be due to several reasons
                     time =  edgeIteratorState.getDistance() / (avgSpeedEnc.getMaxDecimal() * 3.6);
                     timeR = time;
                     edgeIteratorState.set(avgTimeEnc, time);

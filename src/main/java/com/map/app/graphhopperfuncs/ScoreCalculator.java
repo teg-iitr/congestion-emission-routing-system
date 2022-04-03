@@ -30,6 +30,7 @@ public class ScoreCalculator extends FastestWeighting{
 			}
 		return score;
 	}
+
 	public static double calcExposureScore(GraphHopper gh,List<PathDetail> pathDetails,TransportMode mode)
 	{
 		double score = 0;
@@ -43,7 +44,8 @@ public class ScoreCalculator extends FastestWeighting{
 		}
 		return score / Math.pow(10, 3);
 	}
-	public static double calcGreenestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
+
+/*	public static double calcGreenestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
 	{
 		double score = 0;
 		Graph g=gh.getGraphHopperStorage().getBaseGraph();
@@ -55,7 +57,7 @@ public class ScoreCalculator extends FastestWeighting{
 		}
 		return (double) Math.round(score * 100 / 60) / 100;
 	}
-	/*public double calcFastestShortestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
+	public double calcFastestShortestTimeScore(GraphHopper gh, List<PathDetail> pathDetails, TransportMode mode)
 	{
 		double score = 0;
 		Graph g=gh.getGraphHopperStorage().getBaseGraph();
