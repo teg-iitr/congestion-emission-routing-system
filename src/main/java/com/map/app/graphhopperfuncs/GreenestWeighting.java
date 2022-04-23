@@ -7,6 +7,7 @@ import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.routing.weighting.TurnCostProvider;
 import com.graphhopper.routing.weighting.custom.CustomWeightingHelper;
 import com.graphhopper.util.EdgeIteratorState;
+import com.map.app.service.ModeInhalationRate;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class GreenestWeighting extends AbstractWeighting {
 	private static final String NAME="greenest";
 	private final DecimalEncodedValue smokeEnc;
 	private final DecimalEncodedValue timeEnc;
+	private final double inhalationRate;
 	//final DecimalEncodedValue avgSpeedEnc;
 	//private static int avgCount=0;
 
@@ -32,8 +34,9 @@ public class GreenestWeighting extends AbstractWeighting {
 
 	public GreenestWeighting(FlagEncoder flagEncoder, TurnCostProvider turnCostProvider) {
 		super(flagEncoder, turnCostProvider);
-		smokeEnc=flagEncoder.getDecimalEncodedValue("smoke");
-		timeEnc=flagEncoder.getDecimalEncodedValue("time");
+		smokeEnc = flagEncoder.getDecimalEncodedValue("smoke");
+		timeEnc = flagEncoder.getDecimalEncodedValue("time");
+		inhalationRate = ModeInhalationRate.valueOf(flagEncoder.getTransportationMode().toString().toLowerCase()).getNumVal();
 		//    avgSpeedEnc=flagEncoder.getAverageSpeedEnc();
 	}
 	@Override
