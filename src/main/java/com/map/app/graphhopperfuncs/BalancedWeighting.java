@@ -27,6 +27,7 @@ public class BalancedWeighting extends FastestWeighting {
     private final double pollutionFactor;
     private final DecimalEncodedValue smokeEnc;
     private final DecimalEncodedValue timeEnc;
+//    private final
 
     protected BalancedWeighting(FlagEncoder encoder) {
         this(encoder, NO_TURN_COST_PROVIDER);

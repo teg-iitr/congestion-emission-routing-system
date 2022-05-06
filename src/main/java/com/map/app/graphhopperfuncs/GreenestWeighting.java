@@ -61,7 +61,8 @@ public class GreenestWeighting extends AbstractWeighting {
 	public double calcEdgeWeight(EdgeIteratorState edgeState, boolean reverse) {
 		double smoke = edgeState.get(smokeEnc);
 		double time = edgeState.get(timeEnc);
-		return time * smoke;
+//		System.out.println(inhalationRate);
+		return time * smoke * inhalationRate;
 	}
 
 }

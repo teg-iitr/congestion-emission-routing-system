@@ -35,7 +35,7 @@ public class MapControl {
 	}
     
 	@RequestMapping(value="/routing",method=RequestMethod.GET)
-	public String load(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model)
+	public String load(@ModelAttribute("pt") UrlTransformer pt, BindingResult errors, Model model, double timeFactor, double pollutionFactor)
     {
 		
     UrlContainer rp=pt.convert();
