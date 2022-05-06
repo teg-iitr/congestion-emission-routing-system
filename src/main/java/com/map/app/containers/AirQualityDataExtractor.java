@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
@@ -53,7 +52,7 @@ public class AirQualityDataExtractor {
 	 * Fetching the content from the api and parsing the json result
 	 * @param boundingBox
 	 */
-	public void readJSON(BBox boundingBox) {
+	public void readWAQIData(BBox boundingBox) {
 		if (aqiApiKey.equals("<WAQI_API_KEY>")){
 			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
 		}

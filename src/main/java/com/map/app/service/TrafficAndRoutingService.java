@@ -1,15 +1,12 @@
 package com.map.app.service;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.graphhopper.json.Statement;
 
-import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.weighting.custom.CustomProfile;
 import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.shapes.BBox;
@@ -36,14 +33,18 @@ public class TrafficAndRoutingService {
 
 	private String apiKey = System.getenv("here_api_key");
 	
-	private final AirQualityDataExtractor ai;
-	private final TrafficDataExtractor dt;
-	private final RoutePathContainer rp;
+	private final AirQualityDataExtractor airQualityDataExtractor;
+	private final TrafficDataExtractor trafficDataExtractor;
+	private final RoutePathContainer routePathContainer;
 	private final BBox boundingBox;
 	// a few settings for here maps real-time congestion data
 	public enum SpeedChoice{avg_actual_from_hereMaps, free_flow_from_hereMaps, lower_of_two}
 	public static SpeedChoice speedChoice = SpeedChoice.lower_of_two;
 	public static float functional_road_class_here_maps = 4.0f;
+
+	public RoutePathContainer getRoutePathContainer() {
+		return routePathContainer;
+	}
 
 	public TrafficAndRoutingService() {
 		ReadWriteLock lock=new ReentrantReadWriteLock();
@@ -67,7 +68,7 @@ public class TrafficAndRoutingService {
 		gh.getEncodingManagerBuilder().add(smokeEnc);
 		gh.getEncodingManagerBuilder().add(timeEnc);
     	//gh.c
-		try(FileInputStream ip = new FileInputStream("config.properties")) {
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
 			prop.load(ip);
 			System.out.println("Using OSM file "+ prop.getProperty("datareader.file"));
 			config.putObject("datareader.file",prop.getProperty("datareader.file"));
@@ -98,7 +99,8 @@ public class TrafficAndRoutingService {
 			config.putObject("graph.dataaccess", prop.getProperty("graph.dataaccess"));
 			config.putObject("profiles_ch", prop.getProperty("profiles_ch"));
 			
-			if( apiKey==null) apiKey =prop.getProperty("here_api_key"); // the api key must be in either system env or config.properties
+			if(apiKey==null)
+				apiKey = prop.getProperty("here_api_key"); // the api key must be in either system env or config.properties
 		} catch (IOException e) {
 			throw new RuntimeException("Config properties are not found. Aborting ...");
 		}
@@ -109,9 +111,9 @@ public class TrafficAndRoutingService {
     	gh.importOrLoad();
     	//gh.set
     	this.boundingBox = gh.getGraphHopperStorage().getBaseGraph().getBounds();
-    	dt = new TrafficDataExtractor(gh,lock.writeLock());
-    	rp = new RoutePathContainer(gh, lock.readLock());
-    	ai = new AirQualityDataExtractor(gh,lock.writeLock());
+    	trafficDataExtractor = new TrafficDataExtractor(gh,lock.writeLock());
+    	routePathContainer = new RoutePathContainer(gh, lock.readLock());
+    	airQualityDataExtractor = new AirQualityDataExtractor(gh,lock.writeLock());
     }
 	
 	public static String getModeBasedPathChoice(PathChoice pathChoice, TransportMode transportMode) {
@@ -120,6 +122,7 @@ public class TrafficAndRoutingService {
 	
 	public ArrayList<Float> getBoundingBox() {
 		ArrayList<Float> box=new ArrayList<>();
+
 		box.add((float)boundingBox.minLat);
 		box.add((float)boundingBox.minLon);
 		box.add((float)boundingBox.maxLat);
@@ -129,23 +132,18 @@ public class TrafficAndRoutingService {
 	}
     public TrafficData getAll()
 	{
-		return dt.getRoads();
+		return trafficDataExtractor.getRoads();
 	}
 	
-	public void start()
-	{
-		if (apiKey.equals("<HERE_API_KEY>")){
-			throw new RuntimeException("API Key for Here Maps is not found. Aborting...");
-		}
-		dt.fetchData(apiKey, this.boundingBox);
+	public void start() {
+		trafficDataExtractor.readHEREMapData(apiKey, this.boundingBox);
 		
-		ai.readJSON(this.boundingBox);
+		airQualityDataExtractor.readWAQIData(this.boundingBox);
 		
 	}
 
-	public ArrayList<RoutePath> getPath(UrlContainer p)
-	{
-		return rp.find(p);
+	public ArrayList<RoutePath> getPath(UrlContainer p) {
+		return routePathContainer.find(p);
 	}
 
 }

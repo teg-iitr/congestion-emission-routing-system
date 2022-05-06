@@ -1,6 +1,5 @@
 package com.map.app.containers;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -42,14 +41,14 @@ public class TrafficDataExtractor {
         this.writeLock = lock;
     }
 
-    public void fetchData(String apiKey, BBox boundingBox) {
+    public void readHEREMapData(String apiKey, BBox boundingBox) {
         final String URL = "https://traffic.ls.hereapi.com/traffic/6.2/flow.xml?apiKey="
                 + apiKey + "&bbox="
                 + boundingBox.minLat + "," + boundingBox.minLon + ";"
                 + boundingBox.maxLat + "," + boundingBox.maxLon +
                 "&responseattributes=sh,fc&units=metric";
         //System.out.println(URL);
-        parse_XML(URL);
+        parseHEREMapXML(URL);
     }
 
     public void feed(TrafficData tempdt) {
@@ -137,7 +136,7 @@ public class TrafficDataExtractor {
         }
     }
 
-    private void parse_XML(String Url) {
+    private void parseHEREMapXML(String Url) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         try {
@@ -173,26 +172,7 @@ public class TrafficDataExtractor {
                             su = Float.parseFloat(traf_info.getAttribute("SU"));
                         }
                     }
-					/*
-					for (int j = 0; j<myxml.getLength(); j++) {
-						Node child_1 = myxml.item(j);
-						if (child_1.getNodeType() == Node.ELEMENT_NODE) {
-							Element child = (Element) child_1;
-//							if (child.hasAttribute("LE")) {
-//								le = Float.parseFloat(child.getAttribute("LE"));
-//							}
-							if (child.hasAttribute("FC")) {
-								fc = Float.parseFloat(child.getAttribute("FC"));
-							}
-							if (child.hasAttribute("CN")) {
-								cn = Float.parseFloat(child.getAttribute("CN"));
-							}
-							if (child.hasAttribute("SU")) {
-								su = Float.parseFloat(child.getAttribute("SU"));
-							}
-						
-						}
-					}*/
+
                     NodeList temp_shp = road.getElementsByTagName("SHP");
                     if (temp_shp.getLength() > 0) {
                         Node first_shp = temp_shp.item(0);
