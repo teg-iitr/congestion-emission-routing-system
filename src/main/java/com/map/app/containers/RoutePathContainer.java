@@ -77,7 +77,7 @@ public class RoutePathContainer {
 //        getPollutionFactor = 1 - getTimeFactor;
 //        getTimeFactor = getTimeFactor / sumFactors;
 
-        initializeResultsCSV(getTimeFactor, getPollutionFactor);
+        initializeResultsCSV("output_results", String.valueOf(getTimeFactor), String.valueOf(getPollutionFactor));
         List<String> CURBSIDES = Stream.generate(() -> "left").limit(2).collect(Collectors.toList());
         // set routing algorithm
         GHRequest ghRequest = new GHRequest(p.getStartlat(), p.getStartlon(), p.getEndlat(), p.getEndlon())
@@ -140,6 +140,7 @@ public class RoutePathContainer {
             String destination_lon = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() - 1).lon);
             String timeStamp = new SimpleDateFormat("dd/MM/yyyyHH:mm:ss").format(Calendar.getInstance().getTime());
             writeResults(
+                    "output_results",
                     c,
                     origin_lat,
                     origin_lon,
@@ -212,7 +213,7 @@ public class RoutePathContainer {
         return result; //result contains latitudes and longitudes of route and instructions for navigation
     }
 
-    public static void initializeResultsCSV(double timeF, double pollutionF) {
+    public static void initializeResultsCSV(String config_file, String timeF, String pollutionF) {
         FileWriter csvwriter;
         BufferedWriter bufferedWriter = null;
         try {
@@ -221,7 +222,7 @@ public class RoutePathContainer {
 
             try (FileInputStream ip = new FileInputStream("config.properties")) {
                 prop.load(ip);
-                outputDir = prop.getProperty("output_results");
+                outputDir = prop.getProperty(config_file);
 //					timeF = Double.parseDouble(prop.getProperty("balanced_time_factor"));
 //					pollutionF = Double.parseDouble(prop.getProperty("balanced_pollution_factor"));
             } catch (IOException e) {
@@ -270,7 +271,7 @@ public class RoutePathContainer {
         }
     }
 
-    public static void writeResults(int sno, String origin_lat, String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure, double defaultSmoke, double defaultTime, double uTurnCosts, double tFactor, double pFactor, String algorithm, Boolean curbside, String timeStamp) {
+    public static void writeResults(String config_name, int sno, String origin_lat, String origin_lon, String destination_lat, String destination_lon, String routing, double dist, double time, double conc, double exposure, double defaultSmoke, double defaultTime, double uTurnCosts, double tFactor, double pFactor, String algorithm, Boolean curbside, String timeStamp) {
         FileWriter csvwriter;
         BufferedWriter bufferedWriter = null;
         try {
@@ -278,7 +279,7 @@ public class RoutePathContainer {
             String outputDir;
             try (FileInputStream ip = new FileInputStream("config.properties")) {
                 prop.load(ip);
-                outputDir = prop.getProperty("output_results");
+                outputDir = prop.getProperty(config_name);
             } catch (IOException e) {
                 throw new RuntimeException("Config properties are not found. Aborting ...");
             }

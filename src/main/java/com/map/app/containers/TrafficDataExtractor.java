@@ -1,5 +1,8 @@
 package com.map.app.containers;
 
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -27,6 +30,9 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import com.map.app.model.TrafficData;
 
+import static com.map.app.containers.RoutePathContainer.initializeResultsCSV;
+import static com.map.app.containers.RoutePathContainer.writeResults;
+
 /**
  * @author Siftee, Amit
  */
@@ -34,6 +40,11 @@ public class TrafficDataExtractor {
     private TrafficData dt = new TrafficData();
 
     private final Lock writeLock;
+
+    public GraphHopper getHopper() {
+        return hopper;
+    }
+
     private final GraphHopper hopper;
 
     public TrafficDataExtractor(GraphHopper hopper, Lock lock) {
@@ -133,8 +144,10 @@ public class TrafficDataExtractor {
                     edgeIteratorState.setReverse(avgTimeEnc, timeR);
                 }
             }
+
         }
     }
+
 
     private void parseHEREMapXML(String Url) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -199,7 +212,6 @@ public class TrafficDataExtractor {
                                     String[] ans = shp.getTextContent().replace(',', ' ').split(" ");
 
                                     if (k == 0) {
-
                                         las.add(Float.parseFloat(ans[0]));
                                         longs.add(Float.parseFloat(ans[1]));
                                         //System.out.println(las+" "+longs);
@@ -217,7 +229,6 @@ public class TrafficDataExtractor {
                             combospeed.add(su);
                             combospeed.add(ff);
                             tempdt.getSpeed().add(combospeed);
-
                         }
                     }
 

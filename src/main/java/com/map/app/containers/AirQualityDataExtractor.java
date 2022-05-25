@@ -26,6 +26,11 @@ import com.map.app.model.AirQuality;
 public class AirQualityDataExtractor {
 	private final JSONParser jsonP;
 	private final Lock writeLock;
+
+	public GraphHopper getHopper() {
+		return hopper;
+	}
+
 	private final GraphHopper hopper;
 	private String aqiApiKey = System.getenv("waqi_api_key");
 	private static final String url = "https://api.waqi.info/map/bounds/?latlng=";
@@ -116,7 +121,8 @@ public class AirQualityDataExtractor {
 					airQualityArrayList.add(new AirQuality(lat, lon, aqiDouble, name));
 				}
 			}
-
+//			airQualityArrayList.clear();
+//			read_historical_aqi(airQualityArrayList);
 			//assign air quality metric to edge in graphhopper
 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 
