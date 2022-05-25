@@ -34,6 +34,15 @@ public class TrafficAndRoutingService {
 	private String apiKey = System.getenv("here_api_key");
 	
 	private final AirQualityDataExtractor airQualityDataExtractor;
+
+	public AirQualityDataExtractor getAirQualityDataExtractor() {
+		return airQualityDataExtractor;
+	}
+
+	public TrafficDataExtractor getTrafficDataExtractor() {
+		return trafficDataExtractor;
+	}
+
 	private final TrafficDataExtractor trafficDataExtractor;
 	private final RoutePathContainer routePathContainer;
 	private final BBox boundingBox;

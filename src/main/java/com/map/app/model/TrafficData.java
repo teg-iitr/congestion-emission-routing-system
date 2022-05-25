@@ -9,6 +9,7 @@ public class TrafficData {
 	private List<List<Float>> lat;
 	private List<List<Float>> lons;
 	private List<List<Float>> speed;
+	private List<List<Float>> time;
 	public List<List<Float>> getLat() {
 		return lat;
 	}
@@ -27,5 +28,10 @@ public class TrafficData {
 	public void setSpeed(List<List<Float>> speed) {
 		this.speed = speed;
 	}
-
+	public List<List<Float>> getTime() {
+		return time;
+	}
+	public void setTime(List<List<Float>> time) {
+		this.time = time;
+	}
 }
