@@ -5,15 +5,17 @@ import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.util.EdgeIteratorState;
 import com.map.app.containers.AirQualityDataExtractor;
+import com.map.app.containers.RoutePathContainer;
 import com.map.app.containers.TrafficDataExtractor;
+import com.map.app.containers.UrlTransformer;
+import com.map.app.model.UrlContainer;
 import com.map.app.service.TrafficAndRoutingService;
+import com.map.app.service.TransportMode;
 
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.StringJoiner;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SensitivityAnalysis {
     public static void main(String[] args) {
@@ -21,8 +23,9 @@ public class SensitivityAnalysis {
         TrafficAndRoutingService trafficAndRoutingService = new TrafficAndRoutingService();
         double pollutionFactor, timeFactor;
         trafficAndRoutingService.start();
-        generateTrafficData(trafficAndRoutingService);
-        generateAQIData(trafficAndRoutingService);
+//        generateTrafficData(trafficAndRoutingService);
+//        generateAQIData(trafficAndRoutingService);
+        readTrafficData(trafficAndRoutingService);
 //        for (timeFactor = 0.0; timeFactor <= 1.0; timeFactor += 0.10) {
 //            for (pollutionFactor = 0.0; pollutionFactor <= 1.0; pollutionFactor += 0.10) {
 ////                System.out.println((double) Math.round(timeFactor * 100) / 100);
@@ -41,6 +44,51 @@ public class SensitivityAnalysis {
 //                System.out.println("end of iteration");
 //            }
 //        }
+    }
+
+    private static void readTrafficData(TrafficAndRoutingService trafficAndRoutingService) {
+        TrafficDataExtractor trafficDataExtractor = trafficAndRoutingService.getTrafficDataExtractor();
+        AllEdgesIterator allEdges = trafficDataExtractor.getHopper().getGraphHopperStorage().getBaseGraph().getAllEdges();
+        FlagEncoder encoder = trafficDataExtractor.getHopper().getEncodingManager().getEncoder("car");
+        DecimalEncodedValue avgTimeEnc = encoder.getDecimalEncodedValue("time");
+        DecimalEncodedValue avgSpeedEnc = encoder.getAverageSpeedEnc();
+        Map<Integer, List<Double>> trafficData = readResults("here_map_output", "here_map.csv");
+        System.out.println(trafficData);
+    }
+
+    private static  Map<Integer, List<Double>> readResults(String dirName, String fileName) {
+        Map<Integer, List<Double>> values = new HashMap<>();
+        try {
+            Properties prop = new Properties();
+            String inputDir;
+            try (FileInputStream ip = new FileInputStream("config.properties")) {
+                prop.load(ip);
+                inputDir = prop.getProperty(dirName);
+            } catch (IOException e) {
+                throw new RuntimeException("Config properties are not found. Aborting ...");
+            }
+            BufferedReader reader = new BufferedReader(new FileReader(inputDir + fileName));
+            String line = "";
+            int count = 0;
+            reader.readLine();
+            while (reader.readLine() != null) {
+                count++;
+            }
+            reader.reset();
+            reader.readLine();
+            for (int i = 0; i < count; i++) {
+                while ((line = reader.readLine()) != null) {
+                    values.put(i, Stream.of(line.split(","))
+                                    .mapToDouble(Double::parseDouble)
+                                    .boxed()
+                                    .collect(Collectors.toCollection(ArrayList<Double>::new)));
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return values;
     }
 
     private static void generateAQIData(TrafficAndRoutingService trafficAndRoutingService) {
