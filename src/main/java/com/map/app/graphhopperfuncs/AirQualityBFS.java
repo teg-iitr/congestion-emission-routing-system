@@ -1,20 +1,21 @@
 package com.map.app.graphhopperfuncs;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHBitSet;
 import com.graphhopper.coll.GHBitSetImpl;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
-import com.graphhopper.util.SimpleIntDeque;
 import com.graphhopper.util.XFirstSearch;
 import com.map.app.model.AirQuality;
 import com.map.app.service.TransportMode;
@@ -46,19 +47,31 @@ public class AirQualityBFS extends XFirstSearch {
 		// System.out.println(ap);
 
 		//System.out.println(.getAllEdges());
-		
-		for (TransportMode encoder : TransportMode.values()) {
-			FlagEncoder Encoder = hopper.getEncodingManager().getEncoder(encoder.toString());
-			DecimalEncodedValue smokeEnc = Encoder.getDecimalEncodedValue("smoke");
+//		for (AirQuality airQuality : ap) {
+//			System.out.println(airQuality);
+//		}
+		int defaultSmoke;
+		Properties prop=new Properties();
+		try (FileInputStream ip = new FileInputStream("config.properties")) {
+			prop.load(ip);
+			defaultSmoke = Integer.parseInt(prop.getProperty("default_smoke"));
+		} catch (IOException e) {
+			throw new RuntimeException("Config properties are not found. Aborting ...");
+		}
+
+		for (TransportMode mode : TransportMode.values()) {
+			FlagEncoder encoder = hopper.getEncodingManager().getEncoder(mode.toString());
+			DecimalEncodedValue smokeEnc = encoder.getDecimalEncodedValue("smoke");
 			// SimpleIntDeque fifo = new SimpleIntDeque();
 			// GHBitSet visited = createBitSet();
 			// System.out.println("KYA"+gh.getNodes());
 			int count = 0;
 			Set<Integer> edge_uni=new HashSet<>();
-			for (int startNode = 0; startNode < gh.getNodes(); startNode++) {
+			for (int startNode = temp; startNode < gh.getNodes(); startNode++) {
 				EdgeIterator edgeIterator = explorer.setBaseNode(startNode);
 				while (edgeIterator.next()) {
-					EdgeIteratorState edge = gh.getEdgeIteratorState(edgeIterator.getEdge(), Integer.MIN_VALUE);
+					EdgeIteratorState edge = gh.getEdgeIteratorState(edgeIterator.getEdge(), edgeIterator.getAdjNode());
+					edgeIterator.getEdge();
 					if(edge_uni.contains(edgeIterator.getEdge()))
 					{
 						continue;
@@ -70,68 +83,23 @@ public class AirQualityBFS extends XFirstSearch {
 					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
 					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
 					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
-					
 					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
-						edge.set(smokeEnc, 0.);
-						//System.out.println(smokeEnc);
-						// edge.setFl
+						edge.set(smokeEnc, defaultSmoke);
+						edge.setReverse(smokeEnc, defaultSmoke);
 						count++;
 					} else {
-						edge.set(smokeEnc, Math.max(convToConc((airQualityBase + airQualityAdj) / 2),0));
-						//System.out.println(edge.get(smokeEnc));
+						edge.set(smokeEnc, Math.max(convToConcentration((airQualityBase + airQualityAdj) / 2), defaultSmoke));
+						edge.setReverse(smokeEnc, Math.max(convToConcentration((airQualityBase + airQualityAdj) / 2), defaultSmoke));
 						count++;
 					}
 					edge_uni.add(edge.getEdge());
 				}
 			}
-			// System.out.println(visited.getCardinality());
-
-			//System.out.println("Count is " + count);
 		}
 	}
 
-	/*private int BFS(EdgeExplorer explorer, GHBitSet visited, SimpleIntDeque fifo, DecimalEncodedValue smokeEnc) {
-		int current;
-		int count = 0;
-		//System.out.println(smokeEnc.)
-		while (!fifo.isEmpty()) {
-			current = fifo.pop();
-			// if (!goFurther(current))
-			// continue;
-			EdgeIterator iter = explorer.setBaseNode(current);
-
-			while (iter.next()) {
-
-				int connectedId = iter.getAdjNode();
-				// checkAdjacent(iter) &&
-				if (!visited.contains(connectedId)) {
-					double base_lat = gh.getNodeAccess().getLat(current);
-					double base_lon = gh.getNodeAccess().getLon(current);
-					double airQualityBase = IDW(base_lat, base_lon);
-					double adjacent_lat = gh.getNodeAccess().getLat(connectedId);
-					double adjacent_lon = gh.getNodeAccess().getLon(connectedId);
-					double airQualityAdj = IDW(adjacent_lat, adjacent_lon);
-					EdgeIteratorState edge = gh.getEdgeIteratorState(iter.getEdge(), Integer.MIN_VALUE);
-
-					if (Double.isNaN(airQualityAdj) || Double.isNaN(airQualityBase)) {
-						edge.set(smokeEnc, 0.);
-						// count++;
-					} else {
-						edge.set(smokeEnc,convToConc((airQualityBase + airQualityAdj) / 2));
-						// System.out.println(edge.get(smokeEnc));
-						// count++;
-					}
-					visited.add(connectedId);
-					fifo.push(connectedId);
-				}
-
-			}
-
-		}
-		return count;
-	}*/
-	
-	public double convToConc(double aqi)
+	// micro gm / m^3
+	public double convToConcentration(double aqi)
 	{
 		if(aqi>=0 && aqi<=50)		
 		{			return aqi*0.308;		
@@ -163,7 +131,7 @@ public class AirQualityBFS extends XFirstSearch {
 	private double IDW(double fromlat, double fromlon) {
 		double numer = 0;
 		double denom = 0;
-		double exp = 1;
+		double exp = 2;
 		for (AirQuality point : ap) {
 			double v = point.getAqi();
 			double d = haversine(point.getLat(), point.getLon(), fromlat, fromlon);

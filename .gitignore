@@ -2,7 +2,6 @@
 .project
 .settings
 target
-*output/
 results.txt
 *.DS_Store
 *.iml
@@ -12,3 +11,4 @@ results.txt
 */output
 /bin/
 graphLocation
+/output/
