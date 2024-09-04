@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: my-java-app
+    env: java
+    buildCommand: "mvn clean package"
+    startCommand: "mvn spring-boot:run -Dspring-boot.run.arguments='--here_api_key=$here_api_key,--waqi_api_key=$waqi_api_key,--datareader.file=$datareader_file'"
+    envVars:
+      - key: HERE_API_KEY
+        value: s3VqiipIGaDny19BwiChIKfaRnWXnpqzWBsWtZQUSL4
+      - key: WAQI_API_KEY
+        value: d6d59b8d36a955450f1be7172de0324dc009d6a4
+      - key: DATAREADER_FILE
+        value: maps/NewDelhi.osm.pbf
