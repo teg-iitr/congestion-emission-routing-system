@@ -1,0 +1,1 @@
+sno,origin_lat,origin_lon,destination_lat,destination_lon,routing,distance,time,concentration,exposure,default_smoke,default_time,u_turn_costs,time_factor,pollution_factor,algorithm,curbside,timestamp

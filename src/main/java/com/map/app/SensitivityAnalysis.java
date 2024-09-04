@@ -21,7 +21,7 @@ public class SensitivityAnalysis {
     public static void main(String[] args) {
 
         TrafficAndRoutingService trafficAndRoutingService = new TrafficAndRoutingService();
-        double pollutionFactor, timeFactor;
+        Double pollutionFactor, timeFactor;
         trafficAndRoutingService.start();
 //        generateTrafficData(trafficAndRoutingService);
 //        generateAQIData(trafficAndRoutingService);
