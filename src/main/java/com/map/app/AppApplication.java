@@ -1,6 +1,5 @@
 package com.map.app;
 
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,20 +10,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 import com.map.app.service.TrafficAndRoutingService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping; 
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author Siftee
- */
-
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class })
 public class AppApplication {
+
     @Autowired
     TrafficAndRoutingService ts;
 
@@ -52,25 +57,38 @@ public class AppApplication {
                 prop.store(new FileOutputStream("config.properties"), null);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Invalid argument. Please follow proper syntax.Aborting...");
+            throw new RuntimeException("Invalid argument. Please follow proper syntax. Aborting...");
         }
     }
 
     public static void main(String[] args) {
         if (args.length > 1) {
-            throw new RuntimeException("Enter arguments in comma-seperated fashion");
+            throw new RuntimeException("Enter arguments in comma-separated fashion");
         }
         if (args.length == 1) {
             String[] CmdArgs = args[0].split(",");
             insertCMDProperties(CmdArgs);
         }
         SpringApplication.run(AppApplication.class, args);
-
     }
 
     @Scheduled(fixedDelay = 60 * 60 * 1000)
     void jobInitializer() {
         ts.start();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
+                registry.addMapping("/**")  
+                    .allowedOrigins("http://localhost:3001/", "https://tsaas.iitr.ac.in/") 
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true);
+            }
+        };
     }
 
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -82,4 +100,19 @@ public class AppApplication {
 @EnableScheduling
 class SchedulingConfiguration {
 
+}
+
+@RestController
+@RequestMapping("/api")
+class DummyController {
+
+    @PostMapping("/process")
+    public String processInput(@RequestBody String input) {
+        return "Processed: IIT R" + input;
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "Test endpoint done!";
+    }
 }

@@ -23,8 +23,8 @@ public class BalancedWeighting extends FastestWeighting {
     private static final String NAME="balanced";
     private static final String TIME_FACTOR="balanced.time_factor";
     private static final String POLLUTION_FACTOR="balanced.pollution_factor";
-    private final double timeFactor;
-    private final double pollutionFactor;
+    private final Double timeFactor;
+    private final Double pollutionFactor;
     private final DecimalEncodedValue smokeEnc;
     private final DecimalEncodedValue timeEnc;
 //    private final
@@ -42,7 +42,7 @@ public class BalancedWeighting extends FastestWeighting {
     {
         super(encoder, turnCostProvider);
         Properties prop=new Properties();
-        double getTimeFactor, getPollutionFactor;
+        Double getTimeFactor, getPollutionFactor;
         try (FileInputStream ip = new FileInputStream("config.properties")) {
             prop.load(ip);
             getTimeFactor = Double.parseDouble(prop.getProperty("balanced_time_factor"));

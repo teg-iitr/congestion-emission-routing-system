@@ -32,17 +32,33 @@ import com.map.app.service.TransportMode;
 public class RoutePathContainer {
     private final GraphHopper gh;
     private final Lock readLock;
-    private double getTimeFactor;
+    private Double getTimeFactor;
 
-    public void setGetPollutionFactor(double getPollutionFactor) {
+    public void setGetPollutionFactor(Double getPollutionFactor) {
         this.getPollutionFactor = getPollutionFactor;
     }
 
-    private double getPollutionFactor;
+    private Double getPollutionFactor;
 
-    public void setGetTimeFactor(double getTimeFactor) {
-        this.getTimeFactor = getTimeFactor;
+    public void setGetTimeFactor(Double getTimeFactor) {
+        if (getTimeFactor == null) {
+            this.getTimeFactor = getDefaultTimeFactor(); // Provide a default value or handle null
+        } else {
+            this.getTimeFactor = getTimeFactor;
+        }
     }
+
+    // Getter method
+    public Double getGetTimeFactor() {
+        return this.getTimeFactor;
+    }
+
+    // Method to provide a default value
+    private Double getDefaultTimeFactor() {
+        // Your logic to provide a default timeFactor
+        return 1.0; // Example default value
+    }
+
 
     int c = 0;
 
@@ -139,27 +155,27 @@ public class RoutePathContainer {
             String destination_lat = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() - 1).lat);
             String destination_lon = String.valueOf(ghRequest.getPoints().get(ghRequest.getPoints().size() - 1).lon);
             String timeStamp = new SimpleDateFormat("dd/MM/yyyyHH:mm:ss").format(Calendar.getInstance().getTime());
-            writeResults(
-                    "output_results",
-                    c,
-                    origin_lat,
-                    origin_lon,
-                    destination_lat,
-                    destination_lon,
-                    routing.split("_")[0],
-                    distanceScore,
-                    timeScore,
-                    concScore,
-                    exposureScore,
-                    defaultSmoke,
-                    defaultTime,
-                    getUTurnCosts,
-                    getTimeFactor,
-                    getPollutionFactor,
-                    Algorithm,
-                    curbside,
-                    timeStamp
-            );
+            // writeResults(
+            //         "output_results",
+            //         c,
+            //         origin_lat,
+            //         origin_lon,
+            //         destination_lat,
+            //         destination_lon,
+            //         routing.split("_")[0],
+            //         distanceScore,
+            //         timeScore,
+            //         concScore,
+            //         exposureScore,
+            //         defaultSmoke,
+            //         defaultTime,
+            //         getUTurnCosts,
+            //         getTimeFactor,
+            //         getPollutionFactor,
+            //         Algorithm,
+            //         curbside,
+            //         timeStamp
+            // );
             pl = res.getPoints();
         } finally {
             routePath.fillPath(pl, ins);

@@ -57,88 +57,169 @@ public class AirQualityDataExtractor {
 	 * Fetching the content from the api and parsing the json result
 	 * @param boundingBox
 	 */
-	public void readWAQIData(BBox boundingBox) {
-		if (aqiApiKey.equals("<WAQI_API_KEY>")){
-			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
-		}
-		try {
-			writeLock.lock();
+// 	public void readWAQIData(BBox boundingBox) {
+// 		if (aqiApiKey.equals("<WAQI_API_KEY>")){
+// 			throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
+// 		}
+// 		try {
+// 			writeLock.lock();
 
-			URL uri = new URL(url + boundingBox.minLat + "," + boundingBox.minLon + "," + boundingBox.maxLat + "," + boundingBox.maxLon + "&token=" + aqiApiKey);
+// 			URL uri = new URL(url + boundingBox.minLat + "," + boundingBox.minLon + "," + boundingBox.maxLat + "," + boundingBox.maxLon + "&token=" + aqiApiKey);
 
-			HttpURLConnection httpURLConnection = (HttpURLConnection) uri.openConnection();
+// 			HttpURLConnection httpURLConnection = (HttpURLConnection) uri.openConnection();
 
-			int responseCode = httpURLConnection.getResponseCode();
+// 			int responseCode = httpURLConnection.getResponseCode();
 
-			if (responseCode != 200) {
-				throw new RuntimeException("HttpResponseCode: " + responseCode);
-			}
+// 			if (responseCode != 200) {
+// 				throw new RuntimeException("HttpResponseCode: " + responseCode);
+// 			}
 
-			ArrayList<AirQuality> airQualityArrayList = new ArrayList<>();
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-			String inputLine;
-			StringBuilder response = new StringBuilder();
+// 			ArrayList<AirQuality> airQualityArrayList = new ArrayList<>();
+// 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+// 			String inputLine;
+// 			StringBuilder response = new StringBuilder();
 
-			while ((inputLine = bufferedReader .readLine()) != null) {
-				response.append(inputLine);
-			}
+// 			while ((inputLine = bufferedReader .readLine()) != null) {
+// 				response.append(inputLine);
+// 			}
 
-			bufferedReader.close();
+// 			bufferedReader.close();
 
-			JSONObject obj = (JSONObject) jsonP.parse(response.toString());
-			JSONArray data = (JSONArray) obj.get("data");
+// 			JSONObject obj = (JSONObject) jsonP.parse(response.toString());
+// 			JSONArray data = (JSONArray) obj.get("data");
 
-			for (Object datum : data) {
+// 			for (Object datum : data) {
 
-				JSONObject obj1 = (JSONObject) datum;
+// 				JSONObject obj1 = (JSONObject) datum;
 
-				double lat = (double) obj1.get("lat");
-				double lon = (double) obj1.get("lon");
-				String aqi = (String) obj1.get("aqi");
+// 				double lat = (double) obj1.get("lat");
+// 				double lon = (double) obj1.get("lon");
+// 				String aqi = (String) obj1.get("aqi");
 
-				// Regex to check string
-				// contains only digits
-				String regex = "[0-9]+";
+// 				// Regex to check string
+// 				// contains only digits
+// 				String regex = "[0-9]+";
 
-				// Compile the ReGex
-				Pattern pattern = Pattern.compile(regex);
+// 				// Compile the ReGex
+// 				Pattern pattern = Pattern.compile(regex);
 
-				// If the string is empty
-				// return false
-				if (aqi == null) {
-					continue;
-				}
+// 				// If the string is empty
+// 				// return false
+// 				if (aqi == null) {
+// 					continue;
+// 				}
 
-				// Find match between given string
-				// and regular expression
-				// using Pattern.matcher()
-				Matcher matcher = pattern.matcher(aqi);
+// 				// Find match between given string
+// 				// and regular expression
+// 				// using Pattern.matcher()
+// 				Matcher matcher = pattern.matcher(aqi);
 
-				if (matcher.matches()) {
-					double aqiDouble = Double.parseDouble(aqi);
-					JSONObject obj2 = (JSONObject) obj1.get("station");
-					String name = (String) obj2.get("name");
-					airQualityArrayList.add(new AirQuality(lat, lon, aqiDouble, name));
-				}
-			}
-//			airQualityArrayList.clear();
-//			read_historical_aqi(airQualityArrayList);
-			//assign air quality metric to edge in graphhopper
-			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
+// 				if (matcher.matches()) {
+// 					double aqiDouble = Double.parseDouble(aqi);
+// 					JSONObject obj2 = (JSONObject) obj1.get("station");
+// 					String name = (String) obj2.get("name");
+// 					airQualityArrayList.add(new AirQuality(lat, lon, aqiDouble, name));
+// 				}
+// 			}
+// //			airQualityArrayList.clear();
+// //			read_historical_aqi(airQualityArrayList);
+// 			//assign air quality metric to edge in graphhopper
+// 			Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
 
-			AirQualityBFS airQualityBFS = new AirQualityBFS(hopper, gh, airQualityArrayList);
+// 			AirQualityBFS airQualityBFS = new AirQualityBFS(hopper, gh, airQualityArrayList);
 
-			airQualityBFS.start(gh.createEdgeExplorer(), 0);
-			} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
-			writeLock.unlock();
-			System.out.println("WAQI API parsing done...");
-		}
+// 			airQualityBFS.start(gh.createEdgeExplorer(), 0);
+// 			} 
+// 		catch (Exception e) {
+// 			e.printStackTrace();
+// 		}
+// 		finally {
+// 			writeLock.unlock();
+// 			System.out.println("WAQI API parsing done...");
+			
+// 		}
+// 	}
 
-	}
+
+public void readWAQIData(BBox boundingBox) {
+    if (aqiApiKey.equals("<WAQI_API_KEY>")) {
+        throw new RuntimeException("API Key for AQI URL is not found. Aborting...");
+    }
+    try {
+        writeLock.lock();
+        URL uri = new URL(url + boundingBox.minLat + "," + boundingBox.minLon + "," + boundingBox.maxLat + "," + boundingBox.maxLon + "&token=" + aqiApiKey);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) uri.openConnection();
+        int responseCode = httpURLConnection.getResponseCode();
+
+        if (responseCode != 200) {
+            throw new RuntimeException("HttpResponseCode: " + responseCode);
+        }
+
+        ArrayList<AirQuality> airQualityArrayList = new ArrayList<>();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        while ((inputLine = bufferedReader.readLine()) != null) {
+            response.append(inputLine);
+        }
+
+        bufferedReader.close();
+
+        JSONObject obj = (JSONObject) jsonP.parse(response.toString());
+        JSONArray data = (JSONArray) obj.get("data");
+
+        for (Object datum : data) {
+            JSONObject obj1 = (JSONObject) datum;
+            double lat = (double) obj1.get("lat");
+            double lon = (double) obj1.get("lon");
+            String aqi = (String) obj1.get("aqi");
+
+            String regex = "[0-9]+";
+            Pattern pattern = Pattern.compile(regex);
+
+            if (aqi == null) {
+                continue;
+            }
+
+            Matcher matcher = pattern.matcher(aqi);
+
+            if (matcher.matches()) {
+                double aqiDouble = Double.parseDouble(aqi);
+                JSONObject obj2 = (JSONObject) obj1.get("station");
+                String name = (String) obj2.get("name");
+                airQualityArrayList.add(new AirQuality(lat, lon, aqiDouble, name));
+            }
+        }
+
+        // // Print the API data
+        // System.out.println("API Data:");
+        // for (AirQuality aq : airQualityArrayList) {
+        //     System.out.println(aq);
+        // }
+
+        // Read and print historical data
+        ArrayList<AirQuality> historicalData = new ArrayList<>();
+        read_historical_aqi(historicalData);
+        
+        // System.out.println("Historical Data:");
+        // for (AirQuality aq : historicalData) {
+        //     System.out.println(aq);
+        //     airQualityArrayList.add(aq);
+        // }
+
+        Graph gh = hopper.getGraphHopperStorage().getBaseGraph();
+        AirQualityBFS airQualityBFS = new AirQualityBFS(hopper, gh, airQualityArrayList);
+        airQualityBFS.start(gh.createEdgeExplorer(), 0);
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        writeLock.unlock();
+        System.out.println("WAQI API parsing done...");
+    }
+}
+
+
 
 	// reading historical csv aqi data
 	private void read_historical_aqi(ArrayList<AirQuality> ap) {
@@ -154,7 +235,7 @@ public class AirQualityDataExtractor {
 				strings = newLine.split(",");
 				if (strings.length !=0) {
 					if (!Objects.equals(strings[0], "") | !Objects.equals(strings[1], "") | !Objects.equals(strings[2], "") | !Objects.equals(strings[3], ""))
-						// reads the 1/10/19_av data as aqi
+						// reads the first column after locations data as aqi
 						ap.add(new AirQuality(Double.parseDouble(strings[1]), Double.parseDouble(strings[2]), Double.parseDouble(strings[3]), strings[0]));
 				}
 			}
